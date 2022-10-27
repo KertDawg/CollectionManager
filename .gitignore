@@ -1,0 +1,5 @@
+server/vendor
+server/collections.db
+client/node_modules
+
+.vscode
