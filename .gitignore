@@ -1,5 +1,5 @@
 server/vendor
-server/collections.db
+server/Configuration.php
 client/node_modules
 
 .vscode

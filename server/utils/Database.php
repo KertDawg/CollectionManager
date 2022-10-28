@@ -2,49 +2,51 @@
 
 namespace utils;
 
-//require __DIR__ . "/../Configuration.php";
+require __DIR__ . "/../Configuration.php";
 
 
-class Database extends \SQLite3
+class Database extends
 {
-	function __construct()
+    private static $DB = "";
+
+
+	public static function GetDB()
     {
-        //global $Configuration;
+        global $Configuration;
 
 
-        $this->open("collections.db");
-
-        //  Is this a blank database?
-        if ($this->DoesDatabaseNeedInitialization())
+        if (self::$DB == "")
         {
-            $this->InitializeDatabase();
+            $host = $Configuration["DBHost"];
+            $db   = $Configuration["DBSchema"];
+            $user = $Configuration["DBUser"];
+            $pass = $Configuration["DBPassword"];
+            $now = new \DateTime();
+            $mins = $now->getOffset() / 60;
+            $sgn = ($mins < 0 ? -1 : 1);
+            $mins = abs($mins);
+            $hrs = floor($mins / 60);
+            $mins -= $hrs * 60;
+            $offset = sprintf("%+d:%02d", $hrs*$sgn, $mins);
+            
+            $dsn = "mysql:host=$host;dbname=$db";
+            $options = [
+                \PDO::ATTR_PERSISTENT         => true,
+                \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                \PDO::ATTR_EMULATE_PREPARES   => false,
+            ];
+
+            try
+            {
+                 self::$DB = new \PDO($dsn, $user, $pass, $options);
+                 self::$DB->exec("SET time_zone='$offset';");
+            } catch (\PDOException $e) {
+                 throw new \PDOException($e->getMessage(), (int)$e->getCode());
+            }
         }
-    }
 
-    private function DoesDatabaseNeedInitialization()
-    {
-        $Result = $this->query("SELECT COUNT(*) AS TableCount FROM sqlite_master WHERE ((type='table') AND (name='Setting'));");
-
-        while ($row = $Result->fetchArray(SQLITE3_ASSOC))
-        {
-           if ($row["TableCount"] > 0)
-           {
-            return $true;
-           }
-           else
-           {
-            return $false;
-           }
-        }
-    }
-
-    private function InitializeDatabase()
-    {
-        //  Setting
-        $this->exec("CREATE TABLE Setting (Key TEXT, Value	TEXT, PRIMARY KEY(Key));");
-
-        //  Item
-        $this->exec("CREATE TABLE Item (ID TEXT, Name TEXT, PRIMARY KEY(ID));");
+        return self::$DB;
     }
 
     public static function GUID()
