@@ -5,7 +5,7 @@ namespace utils;
 require __DIR__ . "/../Configuration.php";
 
 
-class Database extends
+class Database
 {
     private static $DB = "";
 

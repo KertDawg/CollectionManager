@@ -1,0 +1,10 @@
+{
+  "name": "collection-manager-docker",
+  "scripts": {
+    "deploy": "node deploy.js",
+    "run": "node run.js"
+  },
+  "dependencies": {
+    "async": "^3.2.4"
+  }
+}

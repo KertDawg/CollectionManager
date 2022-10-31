@@ -1,5 +1,9 @@
 server/vendor
 server/Configuration.php
+server/Configuration-Docker.php
 client/node_modules
+docker/Configuration.js
+docker/*.tar
+docker/node_modules
 
 .vscode
