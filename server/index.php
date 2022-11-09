@@ -27,11 +27,15 @@ $router->mount($APIBase, function() use ($router) {
 		echo "The API lives here.";
 	});
 
-	$router->mount("/status", function () use ($router) {
-		$router->get("/db", function () {
-			$DB = new utils\Database();
-			//$Admin = new controllers\Admin();
-			//$Admin->GetStatus();
+	$router->mount("/item", function () use ($router) {
+		$router->get("/", function () {
+			$Item = new controllers\Item();
+			$Item->GetAllItems();
+		});
+
+		$router->post("/add", function () {
+			$Item = new controllers\Item();
+			$Item->AddItem();
 		});
 	});
 });
