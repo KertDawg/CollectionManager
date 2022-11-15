@@ -38,6 +38,28 @@ $router->mount($APIBase, function() use ($router) {
 			$Item->AddItem();
 		});
 	});
+
+	$router->mount("/user", function () use ($router) {
+		$router->post("/login", function () {
+			$User = new controllers\User();
+			$User->LogIn();
+		});
+
+		$router->post("/check", function () {
+			$User = new controllers\User();
+			$User->CheckTokenStatus();
+		});
+
+		$router->get("/validate/{Token}", function ($Token) {
+			$User = new controllers\User();
+			$User->ValidateUser($Token);
+		});
+
+		$router->get("/", function () {
+			$User = new controllers\User();
+			$User->GetUserNames();
+		});
+	});
 });
 
 $router->run();

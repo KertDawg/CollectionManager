@@ -5,7 +5,8 @@ namespace utils;
 require __DIR__ . "/../Configuration.php";
 
 
-class API {
+class API
+{
     const BLOCK_SIZE = 8;
     const IV_LENGTH = 16;
 	const CIPHER = "AES256";
