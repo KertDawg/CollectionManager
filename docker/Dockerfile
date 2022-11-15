@@ -1,4 +1,4 @@
-FROM php:8.0-apache
+FROM php:8.1-apache
 
 
 #  Clear old web files.
@@ -35,6 +35,7 @@ COPY server/controllers/ /var/www/html/api/controllers/
 COPY server/utils/ /var/www/html/api/utils/
 COPY server/vendor/ /var/www/html/api/vendor/
 COPY server/index.php /var/www/html/api/
+COPY server/setup.php /var/www/html/api/
 COPY server/.htaccess /var/www/html/api/
 COPY server/Configuration.php /var/www/html/api/Configuration.php
 

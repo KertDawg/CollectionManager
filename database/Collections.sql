@@ -7,7 +7,7 @@
 #
 # Host: 192.168.1.34 (MySQL 8.0.31-0ubuntu0.22.04.1)
 # Database: Collections
-# Generation Time: 2022-10-31 16:44:25 +0000
+# Generation Time: 2022-11-15 03:44:50 +0000
 # ************************************************************
 
 
@@ -20,13 +20,57 @@ SET NAMES utf8mb4;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
+# Dump of table Detail
+# ------------------------------------------------------------
+
+CREATE TABLE `Detail` (
+  `DetailID` char(36) NOT NULL,
+  `ItemID` char(36) NOT NULL,
+  `DetailType` int NOT NULL,
+  `Photo` blob NOT NULL,
+  `LocationID` char(36) NOT NULL,
+  `TagID` char(36) NOT NULL,
+  PRIMARY KEY (`DetailID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
 # Dump of table Item
 # ------------------------------------------------------------
 
 CREATE TABLE `Item` (
-  `ID` char(36) NOT NULL,
-  `Name` varchar(200) NOT NULL,
-  PRIMARY KEY (`ID`)
+  `ItemID` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `ItemName` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `UserID` char(36) NOT NULL,
+  PRIMARY KEY (`ItemID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+# Dump of table Location
+# ------------------------------------------------------------
+
+CREATE TABLE `Location` (
+  `LocationID` char(36) NOT NULL,
+  `LocationName` varchar(200) NOT NULL,
+  `UserID` char(36) NOT NULL,
+  PRIMARY KEY (`LocationID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+# Dump of table Log
+# ------------------------------------------------------------
+
+CREATE TABLE `Log` (
+  `LogID` char(36) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
+  `LogSeverity` int NOT NULL,
+  `LogType` int NOT NULL,
+  `LogUserID` char(36) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
+  `LogDateTime` datetime NOT NULL,
+  `LogMessage` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  PRIMARY KEY (`LogID`),
+  KEY `LogDateTime` (`LogDateTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -38,6 +82,32 @@ CREATE TABLE `Setting` (
   `Key` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `Value` varchar(200) NOT NULL,
   PRIMARY KEY (`Key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+# Dump of table Tag
+# ------------------------------------------------------------
+
+CREATE TABLE `Tag` (
+  `TagID` char(36) NOT NULL,
+  `TagName` varchar(200) NOT NULL,
+  `UserID` char(36) NOT NULL,
+  PRIMARY KEY (`TagID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+# Dump of table User
+# ------------------------------------------------------------
+
+CREATE TABLE `User` (
+  `UserID` char(36) NOT NULL,
+  `UserName` varchar(200) NOT NULL,
+  `PasswordHash` varchar(200) NOT NULL,
+  `Active` int NOT NULL,
+  `Admin` int NOT NULL,
+  PRIMARY KEY (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
