@@ -92,4 +92,25 @@ class Location
 
 		\utils\API::RespondSuccess("Success");
 	}
+
+	public function DeleteLocation($LocationID)
+	{
+		//  $User["UserID"] will be -1 if they're not logged in.
+		$User = \controllers\User::ValidateToken();
+
+		if ($User["UserID"] == "-1")
+		{
+			\utils\API::RespondError("Invalid user");
+			return;
+		}
+
+		$bq = \utils\Database::GetDB()->prepare("
+		DELETE FROM Location
+		WHERE (UserID = ?)
+		AND (LocationID = ?);
+		");
+		$bq->execute([$User["UserID"], $LocationID]);
+
+		\utils\API::RespondSuccess("Success.");
+	}
 }

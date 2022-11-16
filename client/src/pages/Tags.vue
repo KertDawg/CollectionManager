@@ -13,7 +13,7 @@
         These would be tags.
       </q-card-section>
       <q-card-actions>
-        <q-btn color="primary" label="Add a New Tag" @click="NewTagClick" />
+        <q-btn class="glossy" rounded color="primary" label="Add a New Tag" @click="NewTagClick" />
       </q-card-actions>
     </q-card>
 
@@ -24,8 +24,11 @@
             <q-item-section>
               {{ t.TagName }}
             </q-item-section>
-            <q-item-section>
-              <q-btn icon="edit" @click="EditTagClick(t)" />
+            <q-item-section side>
+              <q-btn class="glossy" rounded icon="edit" @click="EditTagClick(t)" />
+            </q-item-section>
+            <q-item-section side>
+              <q-btn class="glossy" rounded color="negative" icon="delete_forever" @click="DeleteTagClick(t)" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -48,8 +51,25 @@
           </div>
         </q-card-section>
         <q-card-actions>
-          <q-btn label="cancel" v-close-popup />
-          <q-btn color="primary" label="Save" @click="SaveTagClick" />
+          <q-btn class="glossy" rounded label="cancel" v-close-popup />
+          <q-btn class="glossy" rounded color="primary" label="Save" @click="SaveTagClick" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="ShowDeleteDialog">
+      <q-card v-masonry-tile class="InfoCard col-auto">
+        <q-card-section>
+          <div class="row">
+            <div class="col text-h6">Delete a Tag</div>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          Are you sure that you want to delete this tag?
+        </q-card-section>
+        <q-card-actions>
+          <q-btn class="glossy" rounded label="cancel" v-close-popup />
+          <q-btn class="glossy" rounded color="negative" label="Delete" @click="DeleteTagConfirmClick" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -71,6 +91,7 @@ export default {
     return {
       Tags: [],
       ShowEditDialog: false,
+      ShowDeleteDialog: false,
       TagToEdit: {},
     };
   },
@@ -145,6 +166,26 @@ export default {
               });
         }
       }
+    },
+
+    DeleteTagClick: function(Tag)
+    {
+      this.TagToEdit = Tag;
+      this.ShowDeleteDialog = true;
+    },
+
+    DeleteTagConfirmClick: function()
+    {
+      api.get("tag/delete/" + this.TagToEdit.TagID, this.$store)
+              .then((response) =>
+              {
+                notification.ShowSuccess("The tag was deleted.");
+                this.LoadTags();
+                this.ShowDeleteDialog = false;
+              }).catch((e) =>
+              {
+                error.HandleError("Delete tag error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+              });
     },
   },
 };

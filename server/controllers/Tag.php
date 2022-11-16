@@ -92,4 +92,25 @@ class Tag
 
 		\utils\API::RespondSuccess("Success");
 	}
+
+	public function DeleteTag($TagID)
+	{
+		//  $User["UserID"] will be -1 if they're not logged in.
+		$User = \controllers\User::ValidateToken();
+
+		if ($User["UserID"] == "-1")
+		{
+			\utils\API::RespondError("Invalid user");
+			return;
+		}
+
+		$bq = \utils\Database::GetDB()->prepare("
+		DELETE FROM Tag
+		WHERE (UserID = ?)
+		AND (TagID = ?);
+		");
+		$bq->execute([$User["UserID"], $TagID]);
+
+		\utils\API::RespondSuccess("Success.");
+	}
 }

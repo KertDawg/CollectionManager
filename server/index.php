@@ -54,6 +54,11 @@ $router->mount($APIBase, function() use ($router) {
 			$Tag = new controllers\Tag();
 			$Tag->UpdateTag();
 		});
+
+		$router->get("/delete/{TagID}", function ($TagID) {
+			$Tag = new controllers\Tag();
+			$Tag->DeleteTag($TagID);
+		});
 	});
 
 	$router->mount("/location", function () use ($router) {
@@ -67,9 +72,14 @@ $router->mount($APIBase, function() use ($router) {
 			$Location->AddLocation();
 		});
 
-		$router->post("/aupdatedd", function () {
+		$router->post("/update", function () {
 			$Location = new controllers\Location();
 			$Location->UpdateLocation();
+		});
+
+		$router->get("/delete/{LocationID}", function ($LocationID) {
+			$Location = new controllers\Location();
+			$Location->DeleteLocation($LocationID);
 		});
 	});
 

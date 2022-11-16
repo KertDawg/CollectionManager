@@ -13,7 +13,7 @@
         These would be Locations.
       </q-card-section>
       <q-card-actions>
-        <q-btn color="primary" label="Add a New Location" @click="NewLocationClick" />
+        <q-btn class="glossy" rounded color="primary" label="Add a New Location" @click="NewLocationClick" />
       </q-card-actions>
     </q-card>
 
@@ -24,8 +24,11 @@
             <q-item-section>
               {{ t.LocationName }}
             </q-item-section>
-            <q-item-section>
-              <q-btn icon="edit" @click="EditLocationClick(t)" />
+            <q-item-section side>
+              <q-btn class="glossy" rounded icon="edit" @click="EditLocationClick(t)" />
+            </q-item-section>
+            <q-item-section side>
+              <q-btn class="glossy" rounded color="negative" icon="delete_forever" @click="DeleteLocationClick(t)" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -48,12 +51,29 @@
           </div>
         </q-card-section>
         <q-card-actions>
-          <q-btn label="cancel" v-close-popup />
-          <q-btn color="primary" label="Save" @click="SaveLocationClick" />
+          <q-btn class="glossy" rounded label="cancel" v-close-popup />
+          <q-btn class="glossy" rounded color="primary" label="Save" @click="SaveLocationClick" />
         </q-card-actions>
       </q-card>
     </q-dialog>
-  </q-page>
+
+    <q-dialog v-model="ShowDeleteDialog">
+      <q-card v-masonry-tile class="InfoCard col-auto">
+        <q-card-section>
+          <div class="row">
+            <div class="col text-h6">Delete a Location</div>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          Are you sure that you want to delete this location?
+        </q-card-section>
+        <q-card-actions>
+          <q-btn class="glossy" rounded label="cancel" v-close-popup />
+          <q-btn class="glossy" rounded color="negative" label="Delete" @click="DeleteLocationConfirmClick" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+   </q-page>
 </template>
 
 <script>
@@ -71,6 +91,7 @@ export default {
     return {
       Locations: [],
       ShowEditDialog: false,
+      ShowDeleteDialog: false,
       LocationToEdit: {},
     };
   },
@@ -145,6 +166,26 @@ export default {
               });
         }
       }
+    },
+
+    DeleteLocationClick: function(Tag)
+    {
+      this.TagToEdit = Tag;
+      this.ShowDeleteDialog = true;
+    },
+
+    DeleteLocationConfirmClick: function()
+    {
+      api.get("location/delete/" + this.LocationToEdit.LocationID, this.$store)
+              .then((response) =>
+              {
+                notification.ShowSuccess("The location was deleted.");
+                this.LoadLocations();
+                this.ShowDeleteDialog = false;
+              }).catch((e) =>
+              {
+                error.HandleError("Delete location error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+              });
     },
   },
 };
