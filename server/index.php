@@ -39,6 +39,40 @@ $router->mount($APIBase, function() use ($router) {
 		});
 	});
 
+	$router->mount("/tag", function () use ($router) {
+		$router->get("/", function () {
+			$Tag = new controllers\Tag();
+			$Tag->GetAllTags();
+		});
+
+		$router->post("/add", function () {
+			$Tag = new controllers\Tag();
+			$Tag->AddTag();
+		});
+
+		$router->post("/update", function () {
+			$Tag = new controllers\Tag();
+			$Tag->UpdateTag();
+		});
+	});
+
+	$router->mount("/location", function () use ($router) {
+		$router->get("/", function () {
+			$Location = new controllers\Location();
+			$Location->GetAllLocations();
+		});
+
+		$router->post("/add", function () {
+			$Location = new controllers\Location();
+			$Location->AddLocation();
+		});
+
+		$router->post("/aupdatedd", function () {
+			$Location = new controllers\Location();
+			$Location->UpdateLocation();
+		});
+	});
+
 	$router->mount("/user", function () use ($router) {
 		$router->post("/login", function () {
 			$User = new controllers\User();

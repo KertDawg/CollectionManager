@@ -6,7 +6,27 @@
 
         <q-toolbar-title>Collections Manager</q-toolbar-title>
 
-        <q-btn flat round dense icon="settings" to="/settings" v-if="$store.getters['user/IsLoggedIn']" />
+        <q-btn flat round dense icon="settings" v-if="$store.getters['user/IsLoggedIn']">
+          <q-menu
+            auto-close
+            transition-show="jump-down"
+            transition-hide="jump-up">
+            <q-list bordered>
+              <q-item clickable v-ripple to="/locations">
+                <q-item-section avatar>
+                  <q-icon name="public" />
+                </q-item-section>
+                <q-item-section>Locations</q-item-section>
+              </q-item>
+              <q-item clickable v-ripple to="/tags">
+                <q-item-section avatar>
+                  <q-icon name="sell" />
+                </q-item-section>
+                <q-item-section>Tags</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
         <q-btn flat round dense icon="rowing" @click="LogOutClick" v-if="$store.getters['user/IsLoggedIn']" />
         <q-btn flat round dense icon="waving_hand" @click="LogInClick" v-if="!$store.getters['user/IsLoggedIn']" />
       </q-toolbar>

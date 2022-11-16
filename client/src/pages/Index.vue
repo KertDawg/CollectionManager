@@ -21,7 +21,7 @@
         What up.
       </q-card-section>
     </q-card>
-</q-page>
+  </q-page>
 </template>
 
 <script>
