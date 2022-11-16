@@ -104,12 +104,40 @@ class Tag
 			return;
 		}
 
+		//  Does the user own this tag?
+		$UserOwns = $false;
+
 		$bq = \utils\Database::GetDB()->prepare("
-		DELETE FROM Tag
+		SELECT COUNT(*) AS TagCount
+		FROM Tag
 		WHERE (UserID = ?)
 		AND (TagID = ?);
 		");
 		$bq->execute([$User["UserID"], $TagID]);
+
+		foreach($bq as $b)
+		{
+			if ($b["TagCount"] > 0)
+			{
+				$UserOwns = $true;
+			}
+		}
+
+		if ($UserOwns)
+		{
+			$bq = \utils\Database::GetDB()->prepare("
+			DELETE FROM Detail
+			WHERE (TagID = ?);
+			");
+			$bq->execute([$TagID]);
+
+			$bq = \utils\Database::GetDB()->prepare("
+			DELETE FROM Tag
+			WHERE (UserID = ?)
+			AND (TagID = ?);
+			");
+			$bq->execute([$User["UserID"], $TagID]);
+		}
 
 		\utils\API::RespondSuccess("Success.");
 	}

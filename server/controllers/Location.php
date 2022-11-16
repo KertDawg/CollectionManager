@@ -104,12 +104,41 @@ class Location
 			return;
 		}
 
+
+		//  Does the user own this location?
+		$UserOwns = $false;
+
 		$bq = \utils\Database::GetDB()->prepare("
-		DELETE FROM Location
+		SELECT COUNT(*) AS LocationCount
+		FROM Tag
 		WHERE (UserID = ?)
-		AND (LocationID = ?);
+		AND (TagID = ?);
 		");
-		$bq->execute([$User["UserID"], $LocationID]);
+		$bq->execute([$User["UserID"], $TagID]);
+
+		foreach($bq as $b)
+		{
+			if ($b["LocationCount"] > 0)
+			{
+				$UserOwns = $true;
+			}
+		}
+
+		if ($UserOwns)
+		{
+			$bq = \utils\Database::GetDB()->prepare("
+			DELETE FROM Detail
+			WHERE (LocationID = ?);
+			");
+			$bq->execute([$LocationID]);
+
+			$bq = \utils\Database::GetDB()->prepare("
+			DELETE FROM Location
+			WHERE (UserID = ?)
+			AND (LocationID = ?);
+			");
+			$bq->execute([$User["UserID"], $LocationID]);
+		}
 
 		\utils\API::RespondSuccess("Success.");
 	}
