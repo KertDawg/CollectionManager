@@ -9,7 +9,7 @@
       <q-card-section>
         Edit your Locations here.
         Locations can be added to items to group them.
-        An item could be a car, clothing, a pen, or another type of object.
+        An item could be in your bedroom, the park, or a country.
         These would be Locations.
       </q-card-section>
       <q-card-actions>
