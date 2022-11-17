@@ -126,7 +126,7 @@ class Tag
 		if ($UserOwns)
 		{
 			$bq = \utils\Database::GetDB()->prepare("
-			DELETE FROM Detail
+			DELETE FROM ItemTag
 			WHERE (TagID = ?);
 			");
 			$bq->execute([$TagID]);

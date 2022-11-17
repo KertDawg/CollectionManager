@@ -7,7 +7,7 @@
 #
 # Host: 192.168.1.34 (MySQL 8.0.31-0ubuntu0.22.04.1)
 # Database: Collections
-# Generation Time: 2022-11-15 03:44:50 +0000
+# Generation Time: 2022-11-17 03:13:10 +0000
 # ************************************************************
 
 
@@ -20,21 +20,6 @@ SET NAMES utf8mb4;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
-# Dump of table Detail
-# ------------------------------------------------------------
-
-CREATE TABLE `Detail` (
-  `DetailID` char(36) NOT NULL,
-  `ItemID` char(36) NOT NULL,
-  `DetailType` int NOT NULL,
-  `Photo` blob NOT NULL,
-  `LocationID` char(36) NOT NULL,
-  `TagID` char(36) NOT NULL,
-  PRIMARY KEY (`DetailID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
-
 # Dump of table Item
 # ------------------------------------------------------------
 
@@ -43,6 +28,30 @@ CREATE TABLE `Item` (
   `ItemName` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `UserID` char(36) NOT NULL,
   PRIMARY KEY (`ItemID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+# Dump of table ItemLocation
+# ------------------------------------------------------------
+
+CREATE TABLE `ItemLocation` (
+  `ItemLocationID` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `ItemID` char(36) NOT NULL,
+  `LocationID` char(36) NOT NULL,
+  PRIMARY KEY (`ItemLocationID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+# Dump of table ItemTag
+# ------------------------------------------------------------
+
+CREATE TABLE `ItemTag` (
+  `ItemTagID` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `TagID` char(36) NOT NULL,
+  `ItemID` char(36) NOT NULL,
+  PRIMARY KEY (`ItemTagID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -71,6 +80,18 @@ CREATE TABLE `Log` (
   `LogMessage` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   PRIMARY KEY (`LogID`),
   KEY `LogDateTime` (`LogDateTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+# Dump of table Photo
+# ------------------------------------------------------------
+
+CREATE TABLE `Photo` (
+  `PhotoID` char(36) NOT NULL,
+  `ItemID` char(36) NOT NULL,
+  `PhotoData` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`PhotoID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

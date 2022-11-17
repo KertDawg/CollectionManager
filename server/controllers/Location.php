@@ -127,7 +127,7 @@ class Location
 		if ($UserOwns)
 		{
 			$bq = \utils\Database::GetDB()->prepare("
-			DELETE FROM Detail
+			DELETE FROM ItemLocation
 			WHERE (LocationID = ?);
 			");
 			$bq->execute([$LocationID]);
