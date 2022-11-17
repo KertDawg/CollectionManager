@@ -33,9 +33,24 @@ $router->mount($APIBase, function() use ($router) {
 			$Item->GetAllItems();
 		});
 
+		$router->get("/one/{ItemID}", function ($ItemID) {
+			$Item = new controllers\Item();
+			$Item->GetOneItem($ItemID);
+		});
+
 		$router->post("/add", function () {
 			$Item = new controllers\Item();
 			$Item->AddItem();
+		});
+
+		$router->post("/update", function () {
+			$Item = new controllers\Item();
+			$Item->UpdateItem();
+		});
+
+		$router->get("/delete/{ItemID}", function ($ItemID) {
+			$Item = new controllers\Item();
+			$Item->DeleteItem($ItemID);
 		});
 	});
 

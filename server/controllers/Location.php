@@ -106,7 +106,7 @@ class Location
 
 
 		//  Does the user own this location?
-		$UserOwns = $false;
+		$UserOwns = 0;
 
 		$bq = \utils\Database::GetDB()->prepare("
 		SELECT COUNT(*) AS LocationCount
@@ -120,7 +120,7 @@ class Location
 		{
 			if ($b["LocationCount"] > 0)
 			{
-				$UserOwns = $true;
+				$UserOwns = 1;
 			}
 		}
 

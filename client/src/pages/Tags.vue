@@ -9,8 +9,8 @@
       <q-card-section>
         Edit your tags here.
         Tags can be added to items to group them.
-        An item could be a car, clothing, a pen, or another type of object.
-        These would be tags.
+        A item could be a car, clothing, a pen, or another type of object.
+        These groups would be tags.
       </q-card-section>
       <q-card-actions>
         <q-btn class="glossy" rounded color="primary" label="Add a New Tag" @click="NewTagClick" />

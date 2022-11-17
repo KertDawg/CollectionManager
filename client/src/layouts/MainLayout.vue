@@ -34,8 +34,8 @@
 
     <q-page-container>
       <router-view v-slot="{ Component }">
-        <transition enter-active-class="animated flipInX"
-                    leave-active-class="animated flipOutX"
+        <transition enter-active-class="animated flipInY"
+                    leave-active-class="animated flipOutY"
                     appear
                     :duration="300"
                     mode="out-in">
@@ -150,10 +150,10 @@ export default {
           this.ShowLoginDialog = false;
           this.$router.push("/home");
         }
-      });/*.catch((e) =>
+      }).catch((e) =>
       {
         error.HandleError("Login error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
-      });*/
+      });
     },
 
     LogInCancelClick: function ()

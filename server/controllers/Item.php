@@ -40,6 +40,40 @@ class Item
 		\utils\API::RespondSuccess($Out);
 	}
 
+	public function GetOneItem($ItemID)
+	{
+		//  $User["UserID"] will be -1 if they're not logged in.
+		$User = \controllers\User::ValidateToken();
+
+		if ($User["UserID"] == "-1")
+		{
+			\utils\API::RespondError("Invalid user");
+			return;
+		}
+
+		$Out = array();
+
+		$bq = \utils\Database::GetDB()->prepare("
+		SELECT i.ItemID, i.ItemName
+		FROM Item i
+		WHERE (i.UserID = ?)
+		AND (i.ItemID = ?)
+		ORDER BY i.ItemName;
+		");
+		$bq->execute([$User["UserID"], $ItemID]);
+
+		foreach($bq as $b)
+		{
+			$obj = array();
+			$obj["ItemID"] = $b["ItemID"];
+			$obj["ItemName"] = $b["ItemName"];
+
+			$Out["Item"] = $obj;
+		}
+
+		\utils\API::RespondSuccess($Out);
+	}
+
 	public function AddItem()
 	{
 		//  $User["UserID"] will be -1 if they're not logged in.
@@ -63,6 +97,85 @@ class Item
 		$bq->execute([\utils\Database::GUID(), $Item->ItemName, $User["UserID"]]);
 
 
-		\utils\API::RespondSuccess("Success")
+		\utils\API::RespondSuccess("Success");
+	}
+
+	public function UpdateItem()
+	{
+		//  $User["UserID"] will be -1 if they're not logged in.
+		$User = \controllers\User::ValidateToken();
+
+		if ($User["UserID"] == "-1")
+		{
+			\utils\API::RespondError("Invalid user");
+			return;
+		}
+
+		$POST = \utils\API::POST();
+		$Item = $POST->Item;
+
+		$bq = \utils\Database::GetDB()->prepare("
+		UPDATE Item
+		SET ItemName = ?
+		WHERE (ItemID = ?)
+		AND (UserID = ?)
+		");
+		$bq->execute([$Item->ItemName, $Item->ItemID, $User["UserID"]]);
+
+
+		\utils\API::RespondSuccess("Success");
+	}
+
+	public function DeleteItem($ItemID)
+	{
+		//  $User["UserID"] will be -1 if they're not logged in.
+		$User = \controllers\User::ValidateToken();
+
+		if ($User["UserID"] == "-1")
+		{
+			\utils\API::RespondError("Invalid user");
+			return;
+		}
+
+		//  Does the user own this item?
+		$UserOwns = 0;
+
+		$bq = \utils\Database::GetDB()->prepare("
+		SELECT COUNT(*) AS ItemCount
+		FROM Item
+		WHERE (UserID = ?)
+		AND (ItemID = ?);
+		");
+		$bq->execute([$User["UserID"], $ItemID]);
+
+		foreach($bq as $b)
+		{
+			if ($b["ItemCount"] > 0)
+			{
+				$UserOwns = 1;
+			}
+		}
+
+		if ($UserOwns)
+		{
+			$bq = \utils\Database::GetDB()->prepare("
+			DELETE FROM Detail
+			WHERE (ItemID = ?);
+			");
+			$bq->execute([$ItemID]);
+
+			$bq = \utils\Database::GetDB()->prepare("
+			DELETE FROM Item
+			WHERE (UserID = ?)
+			AND (ItemID = ?);
+			");
+			$bq->execute([$User["UserID"], $ItemID]);
+			\utils\API::RespondSuccess("Success.");
+		}
+		else
+		{
+			\utils\API::RespondSuccess($f);
+		}
+
 	}
 }

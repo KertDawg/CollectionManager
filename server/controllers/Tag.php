@@ -105,7 +105,7 @@ class Tag
 		}
 
 		//  Does the user own this tag?
-		$UserOwns = $false;
+		$UserOwns = 0;
 
 		$bq = \utils\Database::GetDB()->prepare("
 		SELECT COUNT(*) AS TagCount
@@ -119,7 +119,7 @@ class Tag
 		{
 			if ($b["TagCount"] > 0)
 			{
-				$UserOwns = $true;
+				$UserOwns = 1;
 			}
 		}
 
