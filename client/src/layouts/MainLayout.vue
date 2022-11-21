@@ -54,8 +54,23 @@
           <q-input v-model="Password" label="Password" type="password" />
         </q-card-section>
         <q-card-actions>
-          <q-btn label="Login" color="primary" @click="LogInDialogClick"></q-btn>
-          <q-btn label="Cancel" @click="LogInCancelClick"></q-btn>
+          <q-btn label="Login" color="primary" @click="LogInDialogClick" />
+          <q-btn label="Cancel" @click="LogInCancelClick" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="ShowLogoutDialog">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Log Out</div>
+        </q-card-section>
+        <q-card-section>
+          Are you sure you want to log out?
+        </q-card-section>
+        <q-card-actions>
+          <q-btn label="Login" color="primary" @click="LogOutDialogClick" />
+          <q-btn label="Cancel" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -80,6 +95,7 @@ export default {
   {
     return {
       ShowLoginDialog: false,
+      ShowLogoutDialog: false,
       UserName: "",
       Password: "",
     };
@@ -124,8 +140,14 @@ export default {
 
     LogOutClick: function ()
     {
+      this.ShowLogoutDialog = true;
+    },
+
+    LogOutDialogClick: function()
+    {
       this.UserName = "";
       this.Password = "";
+      this.ShowLogoutDialog = false;
       this.$store.commit("user/LogOutUser");
       this.$router.push("/home");
     },
@@ -134,12 +156,12 @@ export default {
     {
       api.post("user/login", { UserName: this.UserName, Password: this.Password }, this.$store).then((response) =>
       {
+        this.UserName = "";
+        this.Password = "";
+
         if (response.UserID == -1)
         {
           //  This is a failed login.
-          this.UserName = "";
-          this.Password = "";
-
           notification.ShowFailure("The login was invalid.");
         }
         else
