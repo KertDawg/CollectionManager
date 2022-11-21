@@ -7,7 +7,7 @@
 #
 # Host: 192.168.1.34 (MySQL 8.0.31-0ubuntu0.22.04.1)
 # Database: Collections
-# Generation Time: 2022-11-21 19:50:13 +0000
+# Generation Time: 2022-11-21 20:41:30 +0000
 # ************************************************************
 
 
@@ -37,6 +37,7 @@ LOCK TABLES `Color` WRITE;
 INSERT INTO `Color` (`ColorID`, `ColorCode`, `ColorName`, `TextCode`)
 VALUES
 	('','','- NONE -',''),
+	('3b3571a3-471e-4411-82e9-88c1e9811b47','#ffffff','Burnt Umber on White','#6e260e'),
 	('70144400-13e4-4277-942e-818a60d074d9','#007f00','Green on White','#ffffff'),
 	('744f4117-64a1-4128-ab17-de4df8a97411','#ffffff','Black on White','#000000'),
 	('b4aabe21-e7f1-4dd1-a5d4-43d9fcb0804e','#00007f','Grey on Blue','#ffff00'),
@@ -62,6 +63,7 @@ LOCK TABLES `Icon` WRITE;
 INSERT INTO `Icon` (`IconID`, `IconCode`, `IconName`)
 VALUES
 	('','','- NONE -'),
+	('0ec13f38-c118-4087-86f2-2e15b30d0898','table_restaurant','Table'),
 	('C65CC857-AE51-4798-A59C-7D2787A44E30','casino','Dice');
 
 /*!40000 ALTER TABLE `Icon` ENABLE KEYS */;
@@ -111,6 +113,8 @@ CREATE TABLE `Location` (
   `LocationID` char(36) NOT NULL,
   `LocationName` varchar(200) NOT NULL,
   `UserID` char(36) NOT NULL,
+  `ColorID` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `IconID` char(36) NOT NULL,
   PRIMARY KEY (`LocationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

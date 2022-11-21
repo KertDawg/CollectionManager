@@ -22,7 +22,10 @@
         <q-list bordered>
           <q-item v-for="t in Locations" :key="t.LocationID">
             <q-item-section>
-              {{ t.LocationName }}
+              <div class="row items-center LocationEntry" :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }">
+                <q-icon :name="t.IconCode" class="LocationIcon" size="xl" />
+                <div>{{ t.LocationName }}</div>
+              </div>
             </q-item-section>
             <q-item-section side>
               <q-btn class="glossy" rounded icon="edit" @click="EditLocationClick(t)" />
@@ -39,14 +42,56 @@
       <q-card v-masonry-tile class="InfoCard col-auto">
         <q-card-section>
           <div class="row">
-            <div class="col text-h6" v-if="LocationToEdit.LocationID.length < 1">Add a Location</div>
-            <div class="col text-h6" v-if="LocationToEdit.LocationID.length > 0">Edit a Location</div>
+            <div class="col text-h6" v-if="SelectedLocation.LocationID.length < 1">Add a Location</div>
+            <div class="col text-h6" v-if="SelectedLocation.LocationID.length > 0">Edit a Location</div>
           </div>
         </q-card-section>
         <q-card-section>
           <div class="row">
             <div class="col-md-12">
-              <q-input v-model="LocationToEdit.LocationName" label="Location Name" />
+              <q-input v-model="SelectedLocation.LocationName" label="Location Name" />
+            </div>
+          </div>
+          <div class="row FormRow">
+            <div class="col-md-12">
+              <q-select
+                v-model="SelectedIcon"
+                :options="Icons"
+                option-value="IconID"
+                option-label="IconName"
+                label="Icon">
+                <template v-slot:option="{ itemProps, opt }">
+                  <q-item v-bind="itemProps">
+                    <q-item-section avatar>
+                      <q-icon :name="opt.IconCode" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ opt.IconName }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </div>
+          </div>
+          <div class="row FormRow">
+            <div class="col-md-12">
+              <q-select
+                v-model="SelectedColor"
+                :options="Colors"
+                option-value="ColorID"
+                option-label="ColorName"
+                label="Color">
+                <template v-slot:option="{ itemProps, opt }">
+                  <q-item v-bind="itemProps">
+                    <q-item-section avatar>
+                      <q-icon name="tag_faces" :style="{ 'color': opt.TextCode, 'background-color': opt.ColorCode, 'padding': '8px' }" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ opt.ColorName }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
             </div>
           </div>
         </q-card-section>
@@ -90,15 +135,21 @@ export default {
   {
     return {
       Locations: [],
+      Colors: [],
+      Icons: [],
       ShowEditDialog: false,
       ShowDeleteDialog: false,
-      LocationToEdit: {},
+      SelectedLocation: {},
+      SelectedColor: {},
+      SelectedIcon: {},
     };
   },
 
   mounted()
   {
     this.LoadLocations();
+    this.LoadIcons();
+    this.LoadColors();
   },
 
   methods:
@@ -115,17 +166,74 @@ export default {
           });
     },
 
+    LoadIcons: function()
+    {
+      api.get("icon", this.$store)
+          .then((response) =>
+          {
+            this.Icons = response.Icons;
+          }).catch((e) =>
+          {
+            error.HandleError("Get icons error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+          });
+    },
+
+    LoadColors: function()
+    {
+      api.get("color", this.$store)
+          .then((response) =>
+          {
+            this.Colors = response.Colors;
+          }).catch((e) =>
+          {
+            error.HandleError("Get colors error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+          });
+    },
+
     EditLocationClick: function(Location)
     {
-      this.LocationToEdit = Location;
+      this.SelectedLocation = Location;
+      var MatchingIcons = this.Icons.filter(i => { return (i.IconID === this.SelectedLocation.IconID); });
+
+      if (MatchingIcons.length > 0)
+      {
+        this.SelectedIcon = MatchingIcons[0];
+      }
+      else
+      {
+        this.SelectedIcon = this.Icons[0];
+      }
+      
+
+      var MatchingColors = this.Colors.filter(c => { return (c.ColorID === this.SelectedLocation.ColorID); });
+
+      if (MatchingColors.length > 0)
+      {
+        this.SelectedColor = MatchingColors[0];
+      }
+      else
+      {
+        this.SelectedColor = this.Colors[0];
+      }
+
       this.ShowEditDialog = true;
     },
 
     NewLocationClick: function()
     {
-      this.LocationToEdit = {
+      this.SelectedLocation = {
         LocationID: "",
         LocationName: "",
+      };
+
+      this.SelectedColor = {
+        ColorID: "",
+        ColorName: "- NONE -",
+      };
+
+      this.SelectedIcon = {
+        IconID: "",
+        IconName: "- NONE -",
       };
 
       this.ShowEditDialog = true;
@@ -133,15 +241,18 @@ export default {
 
     SaveLocationClick: function()
     {
-      if (this.LocationToEdit.LocationName.length < 1)
+      if (this.SelectedLocation.LocationName.length < 1)
       {
         notification.ShowFailure("Enter a Location name.");
       }
       else
       {
-        if (this.LocationToEdit.LocationID.length < 1)
+        this.SelectedLocation.IconID = this.SelectedIcon.IconID;
+        this.SelectedLocation.ColorID = this.SelectedColor.ColorID;
+
+        if (this.SelectedLocation.LocationID.length < 1)
         {
-          api.post("location/add", { Location: this.LocationToEdit }, this.$store)
+          api.post("location/add", { Location: this.SelectedLocation }, this.$store)
               .then((response) =>
               {
                 notification.ShowSuccess("The location was added.");
@@ -154,7 +265,7 @@ export default {
         }
         else
         {
-          api.post("location/update", { Location: this.LocationToEdit }, this.$store)
+          api.post("location/update", { Location: this.SelectedLocation }, this.$store)
               .then((response) =>
               {
                 notification.ShowSuccess("The location was saved.");
@@ -170,13 +281,13 @@ export default {
 
     DeleteLocationClick: function(Tag)
     {
-      this.LocationToEdit = Tag;
+      this.SelectedLocation = Tag;
       this.ShowDeleteDialog = true;
     },
 
     DeleteLocationConfirmClick: function()
     {
-      api.get("location/delete/" + this.LocationToEdit.LocationID, this.$store)
+      api.get("location/delete/" + this.SelectedLocation.LocationID, this.$store)
               .then((response) =>
               {
                 notification.ShowSuccess("The location was deleted.");
@@ -191,3 +302,18 @@ export default {
 };
 
 </script>
+
+<style scoped>
+
+div.LocationEntry
+{
+  padding: 8px;
+  margin-left: 16px;
+}
+
+i.LocationIcon
+{
+  padding-right: 8px;
+}
+
+</style>
