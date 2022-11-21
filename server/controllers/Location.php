@@ -154,4 +154,62 @@ class Location
 
 		\utils\API::RespondSuccess("Success.");
 	}
+
+	public function SyncItemLocations($Item)
+	{
+		$bq = \utils\Database::GetDB()->prepare("
+		DELETE FROM ItemLocation
+		WHERE (ItemID = ?);
+		");
+		$bq->execute([$Item->ItemID]);
+
+		foreach($Item->Locations as $b)
+		{
+			$bq = \utils\Database::GetDB()->prepare("
+			INSERT INTO ItemLocation
+			(ItemLocationID, ItemID, LocationID)
+			VALUES
+			(?, ?, ?);
+			");
+			$bq->execute([\utils\Database::GUID(), $Item->ItemID, $b->LocationID]);
+		}
+	}
+
+	public function GetLocationsForItem($ItemID)
+	{
+		$out = array();
+
+		$iq = \utils\Database::GetDB()->prepare("
+		SELECT il.ItemLocationID, l.LocationID, l.LocationName, l.ColorID, l.IconID, c.ColorCode, c.ColorName, c.TextCode,
+		i.IconCode, i.IconName
+		FROM ItemLocation il
+		INNER JOIN Location l
+		ON (il.LocationID = l.LocationID)
+		LEFT JOIN Icon i
+		ON (l.IconID = i.IconID)
+		LEFT JOIN Color c
+		ON (l.ColorID = c.ColorID)
+		WHERE (il.ItemID = ?)
+		ORDER BY l.LocationName;
+		");
+		$iq->execute([$ItemID]);
+
+		foreach($iq as $i)
+		{
+			$t = array();
+			$t["ItemLocationID"] = $i["ItemLocationID"];
+			$t["LocationID"] = $i["LocationID"];
+			$t["LocationName"] = $i["LocationName"];
+			$t["IconID"] = $i["IconID"];
+			$t["ColorID"] = $i["ColorID"];
+			$t["ColorCode"] = $i["ColorCode"];
+			$t["ColorName"] = $i["ColorName"];
+			$t["TextCode"] = $i["TextCode"];
+			$t["IconCode"] = $i["IconCode"];
+			$t["IconName"] = $i["IconName"];
+			array_push($out, $t);
+		}
+
+		return $out;
+	}
 }

@@ -13,6 +13,50 @@
                      label="Item Name" />
           </div>
         </div>
+        <div class="row">
+          <div class="col-12">
+            <q-select
+                v-model="Item.Locations"
+                multiple
+                :options="Locations"
+                option-value="LocationID"
+                option-label="LocationName"
+                label="Locations">
+                <template v-slot:option="{ itemProps, opt }">
+                  <q-item v-bind="itemProps">
+                    <q-item-section avatar :style="{ 'background-color': opt.ColorCode, 'color': opt.TextCode }">
+                      <q-icon :name="opt.IconCode" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ opt.LocationName }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <q-select
+                v-model="Item.Tags"
+                multiple
+                :options="Tags"
+                option-value="TagID"
+                option-label="TagName"
+                label="Tags">
+                <template v-slot:option="{ itemProps, opt }">
+                  <q-item v-bind="itemProps">
+                    <q-item-section avatar :style="{ 'background-color': opt.ColorCode, 'color': opt.TextCode }">
+                      <q-icon :name="opt.IconCode" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ opt.TagName }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+          </div>
+        </div>
       </q-card-section>
       <q-card-actions>
         <q-btn class="glossy" rounded color="primary" icon="save" @click="SaveItemClick()" />
@@ -56,6 +100,8 @@ export default {
         ItemID: "",
         ItemName: "",        
       },
+      Locations: [],
+      Tags: [],
       NewItemMode: false,
       ShowDeleteDialog: false,
     };
@@ -80,6 +126,8 @@ export default {
   mounted()
   {
     this.CheckProperties();
+    this.LoadLocations();
+    this.LoadTags();
   },
 
   methods:
@@ -110,6 +158,30 @@ export default {
           }).catch((e) =>
           {
             error.HandleError("Get item error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+          });
+    },
+
+    LoadLocations: function()
+    {
+      api.get("location", this.$store)
+          .then((response) =>
+          {
+            this.Locations = response.Locations;
+          }).catch((e) =>
+          {
+            error.HandleError("Get locations error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+          });
+    },
+
+    LoadTags: function()
+    {
+      api.get("tag", this.$store)
+          .then((response) =>
+          {
+            this.Tags = response.Tags;
+          }).catch((e) =>
+          {
+            error.HandleError("Get tags error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
           });
     },
 
@@ -170,3 +242,12 @@ export default {
 };
 
 </script>
+
+<style scoped>
+
+i.LocationIcon
+{
+  padding-right: 8px;
+}
+
+</style>

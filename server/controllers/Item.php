@@ -18,6 +18,8 @@ class Item
 			return;
 		}
 
+		$Tag = new Tag();
+		$Location = new Location();
 		$Out = array();
 		$Out["Items"] = array();
 
@@ -29,10 +31,14 @@ class Item
 		");
 		$bq->execute([$User["UserID"]]);
 
-		foreach($bq as $b) {
+		foreach($bq as $b)
+		{
 			$obj = array();
 			$obj["ItemID"] = $b["ItemID"];
 			$obj["ItemName"] = $b["ItemName"];
+
+			$obj["Tags"] = $Tag->GetTagsForItem($b["ItemID"]);
+			$obj["Locations"] = $Location->GetLocationsForItem($b["ItemID"]);
 
 			array_push($Out["Items"], $obj);
 		}
@@ -51,6 +57,8 @@ class Item
 			return;
 		}
 
+		$Tag = new Tag();
+		$Location = new Location();
 		$Out = array();
 
 		$bq = \utils\Database::GetDB()->prepare("
@@ -67,6 +75,9 @@ class Item
 			$obj = array();
 			$obj["ItemID"] = $b["ItemID"];
 			$obj["ItemName"] = $b["ItemName"];
+
+			$obj["Tags"] = $Tag->GetTagsForItem($b["ItemID"]);
+			$obj["Locations"] = $Location->GetLocationsForItem($b["ItemID"]);
 
 			$Out["Item"] = $obj;
 		}
@@ -96,6 +107,11 @@ class Item
 		");
 		$bq->execute([\utils\Database::GUID(), $Item->ItemName, $User["UserID"]]);
 
+		$Location = new Location();
+		$Location->SyncItemLocations($Item);
+
+		$Tag = new Tag();
+		$Tag->SyncItemTags($Item);
 
 		\utils\API::RespondSuccess("Success");
 	}
@@ -122,6 +138,11 @@ class Item
 		");
 		$bq->execute([$Item->ItemName, $Item->ItemID, $User["UserID"]]);
 
+		$Location = new Location();
+		$Location->SyncItemLocations($Item);
+
+		$Tag = new Tag();
+		$Tag->SyncItemTags($Item);
 
 		\utils\API::RespondSuccess("Success");
 	}

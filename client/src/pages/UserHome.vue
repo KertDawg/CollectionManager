@@ -1,17 +1,6 @@
 <template>
   <q-page v-masonry trsnsition-dureciton="0.3s" gutter="10" stagger="0.03s">
-    <q-card v-masonry-tile class="InfoCard col-auto" v-if="!$store.getters['user/IsLoggedIn']">
-      <q-card-section>
-        <div class="row">
-          <div class="col text-h6">Who are you?</div>
-        </div>
-      </q-card-section>
-      <q-card-section>
-        You should log in.
-      </q-card-section>
-    </q-card>
-
-    <q-card v-masonry-tile class="InfoCard col-auto" v-if="$store.getters['user/IsLoggedIn']">
+    <q-card v-masonry-tile class="InfoCard col-auto">
       <q-card-section>
         <div class="row">
           <div class="col text-h6">Items</div>
@@ -25,16 +14,26 @@
       </q-card-actions>
     </q-card>
 
-    <q-card v-masonry-tile class="InfoCard col-auto" v-if="$store.getters['user/IsLoggedIn']">
-      <q-card-section>
-        <q-list bordered>
-          <q-item v-for="i in Items" :key="i.ItemID" clickable :to="'/item/' + i.ItemID">
-            <q-item-section>
-              {{ i.ItemName }}
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-card-section>
+    <q-card v-masonry-tile class="InfoCard col-auto" v-for="i in Items" :key="i.ItemID">
+      <q-item clickable :to="'/item/' + i.ItemID">
+        <q-item-section avatar v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode }">
+          <q-avatar>
+            <q-icon :name="l.IconCode" class="LocationIcon" size="xl" />
+          </q-avatar>
+        </q-item-section>
+
+        <q-item-section>
+          <q-item-label class="ItemName">{{ i.ItemName }}</q-item-label>
+          <q-item-label>
+            <q-chip v-for="t in i.Tags" :key="t.TagID" :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }"
+                    class="glossy" :color="t.ColorCode" :text-color="t.TextCode" :icon="t.IconCode">
+              {{ t.TagName }}
+            </q-chip>
+          </q-item-label>
+        </q-item-section>
+      </q-item>
+
+      <img src="https://cdn.quasar.dev/img/parallax2.jpg" />
     </q-card>
   </q-page>
 </template>
@@ -85,3 +84,13 @@ export default {
 };
 
 </script>
+
+<style scoped>
+
+div.ItemName
+{
+  font-size: x-large;
+  font-weight: bold;
+}
+
+</style>
