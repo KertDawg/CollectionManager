@@ -27,7 +27,7 @@ class Tag
 		FROM Tag t
 		LEFT JOIN Icon i
 		ON (t.IconID = i.IconID)
-		LEFt JOIN Color c
+		LEFT JOIN Color c
 		ON (t.ColorID = c.ColorID)
 		WHERE (t.UserID = ?)
 		ORDER BY t.TagName;
