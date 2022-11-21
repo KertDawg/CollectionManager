@@ -54,7 +54,7 @@
           <q-input v-model="Password" label="Password" type="password" />
         </q-card-section>
         <q-card-actions>
-          <q-btn label="Login" color="primary" @click="LogInDialogClick" />
+          <q-btn label="Log In" color="primary" @click="LogInDialogClick" />
           <q-btn label="Cancel" @click="LogInCancelClick" />
         </q-card-actions>
       </q-card>
@@ -69,7 +69,7 @@
           Are you sure you want to log out?
         </q-card-section>
         <q-card-actions>
-          <q-btn label="Login" color="primary" @click="LogOutDialogClick" />
+          <q-btn label="Log Out" color="primary" @click="LogOutDialogClick" />
           <q-btn label="Cancel" v-close-popup />
         </q-card-actions>
       </q-card>
