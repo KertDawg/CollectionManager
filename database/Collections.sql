@@ -1,13 +1,13 @@
 # ************************************************************
 # Sequel Ace SQL dump
-# Version 20039
+# Version 20042
 #
 # https://sequel-ace.com/
 # https://github.com/Sequel-Ace/Sequel-Ace
 #
 # Host: 192.168.1.34 (MySQL 8.0.31-0ubuntu0.22.04.1)
 # Database: Collections
-# Generation Time: 2022-11-17 03:13:10 +0000
+# Generation Time: 2022-11-21 19:50:13 +0000
 # ************************************************************
 
 
@@ -18,6 +18,54 @@ SET NAMES utf8mb4;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE='NO_AUTO_VALUE_ON_ZERO', SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+# Dump of table Color
+# ------------------------------------------------------------
+
+CREATE TABLE `Color` (
+  `ColorID` char(36) NOT NULL DEFAULT '',
+  `ColorCode` varchar(40) NOT NULL DEFAULT '',
+  `ColorName` varchar(40) NOT NULL DEFAULT '',
+  `TextCode` varchar(40) NOT NULL DEFAULT '',
+  PRIMARY KEY (`ColorID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+LOCK TABLES `Color` WRITE;
+/*!40000 ALTER TABLE `Color` DISABLE KEYS */;
+
+INSERT INTO `Color` (`ColorID`, `ColorCode`, `ColorName`, `TextCode`)
+VALUES
+	('','','- NONE -',''),
+	('70144400-13e4-4277-942e-818a60d074d9','#007f00','Green on White','#ffffff'),
+	('744f4117-64a1-4128-ab17-de4df8a97411','#ffffff','Black on White','#000000'),
+	('b4aabe21-e7f1-4dd1-a5d4-43d9fcb0804e','#00007f','Grey on Blue','#ffff00'),
+	('cd9c0c3d-797c-4a72-9928-15609de75006','#ffffff','Red on White','#ff0000');
+
+/*!40000 ALTER TABLE `Color` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table Icon
+# ------------------------------------------------------------
+
+CREATE TABLE `Icon` (
+  `IconID` char(36) NOT NULL DEFAULT '',
+  `IconCode` varchar(40) NOT NULL DEFAULT '',
+  `IconName` varchar(40) NOT NULL DEFAULT '',
+  PRIMARY KEY (`IconID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+LOCK TABLES `Icon` WRITE;
+/*!40000 ALTER TABLE `Icon` DISABLE KEYS */;
+
+INSERT INTO `Icon` (`IconID`, `IconCode`, `IconName`)
+VALUES
+	('','','- NONE -'),
+	('C65CC857-AE51-4798-A59C-7D2787A44E30','casino','Dice');
+
+/*!40000 ALTER TABLE `Icon` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table Item
@@ -114,6 +162,8 @@ CREATE TABLE `Tag` (
   `TagID` char(36) NOT NULL,
   `TagName` varchar(200) NOT NULL,
   `UserID` char(36) NOT NULL,
+  `IconID` char(36) NOT NULL,
+  `ColorID` char(36) NOT NULL,
   PRIMARY KEY (`TagID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
