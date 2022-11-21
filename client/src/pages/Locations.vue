@@ -170,7 +170,7 @@ export default {
 
     DeleteLocationClick: function(Tag)
     {
-      this.TagToEdit = Tag;
+      this.LocationToEdit = Tag;
       this.ShowDeleteDialog = true;
     },
 

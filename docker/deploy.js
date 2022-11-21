@@ -120,6 +120,10 @@ Commands.push((callback) => {
 });
 
 Commands.push((callback) => {
+    SCP("../database/Accounts.sql", "Accounts.sql", callback);
+});
+
+Commands.push((callback) => {
     SCP("../database/Collections.sql", "Collections.sql", callback);
 });
 

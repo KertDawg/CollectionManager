@@ -37,13 +37,13 @@ class Database
                 \PDO::ATTR_EMULATE_PREPARES   => false,
             ];
 
-            try
-            {
+            //try
+            //{
                  self::$DB = new \PDO($dsn, $user, $pass, $options);
                  self::$DB->exec("SET time_zone='$offset';");
-            } catch (\PDOException $e) {
-                 throw new \PDOException($e->getMessage(), (int)$e->getCode());
-            }
+            //} catch (\PDOException $e) {
+            //     throw new \PDOException($e->getMessage(), (int)$e->getCode());
+            //}
         }
 
         return self::$DB;

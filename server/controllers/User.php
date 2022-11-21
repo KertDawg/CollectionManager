@@ -124,7 +124,15 @@ class User
 			);
 		}
 
-		\utils\Log::LogEvent(\utils\Log::SEVERITY_INFORMATION, \utils\Log::TYPE_GOODTOKEN, $user["UserID"], "The token was valid.  Browser token: " . $Browser);
+		if ($UserData["UserID"] == -1)
+		{
+			\utils\Log::LogEvent(\utils\Log::SEVERITY_INFORMATION, \utils\Log::TYPE_GOODTOKEN, $UserData["UserID"], "Bad token or something.  Browser token: " . $Browser);
+		}
+		else
+		{
+			\utils\Log::LogEvent(\utils\Log::SEVERITY_INFORMATION, \utils\Log::TYPE_GOODTOKEN, $UserData["UserID"], "The token was valid.  Browser token: " . $Browser);
+		}
+
 		return $UserData;
 	}
 

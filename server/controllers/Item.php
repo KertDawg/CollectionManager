@@ -159,7 +159,19 @@ class Item
 		if ($UserOwns)
 		{
 			$bq = \utils\Database::GetDB()->prepare("
-			DELETE FROM Detail
+			DELETE FROM ItemLocation
+			WHERE (ItemID = ?);
+			");
+			$bq->execute([$ItemID]);
+
+			$bq = \utils\Database::GetDB()->prepare("
+			DELETE FROM ItemTag
+			WHERE (ItemID = ?);
+			");
+			$bq->execute([$ItemID]);
+
+			$bq = \utils\Database::GetDB()->prepare("
+			DELETE FROM Photo
 			WHERE (ItemID = ?);
 			");
 			$bq->execute([$ItemID]);

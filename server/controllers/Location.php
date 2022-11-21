@@ -110,11 +110,11 @@ class Location
 
 		$bq = \utils\Database::GetDB()->prepare("
 		SELECT COUNT(*) AS LocationCount
-		FROM Tag
+		FROM Location
 		WHERE (UserID = ?)
-		AND (TagID = ?);
+		AND (LocationID = ?);
 		");
-		$bq->execute([$User["UserID"], $TagID]);
+		$bq->execute([$User["UserID"], $LocationID]);
 
 		foreach($bq as $b)
 		{
