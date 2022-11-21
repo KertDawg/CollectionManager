@@ -98,6 +98,20 @@ $router->mount($APIBase, function() use ($router) {
 		});
 	});
 
+	$router->mount("/icon", function () use ($router) {
+		$router->get("/", function () {
+			$Icon = new controllers\Icon();
+			$Icon->GetAllIcons();
+		});
+	});
+
+	$router->mount("/color", function () use ($router) {
+		$router->get("/", function () {
+			$Color = new controllers\Color();
+			$Color->GetAllColors();
+		});
+	});
+
 	$router->mount("/user", function () use ($router) {
 		$router->post("/login", function () {
 			$User = new controllers\User();

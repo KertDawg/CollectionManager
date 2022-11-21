@@ -22,10 +22,15 @@ class Tag
 		$Out["Tags"] = array();
 
 		$bq = \utils\Database::GetDB()->prepare("
-		SELECT TagID, TagName
-		FROM Tag
-		WHERE (UserID = ?)
-		ORDER BY TagName;
+		SELECT t.TagID, t.TagName, t.IconID, t.ColorID, c.ColorCode, c.ColorName, c.TextCode,
+		i.IconCode, i.IconName
+		FROM Tag t
+		LEFT JOIN Icon i
+		ON (t.IconID = i.IconID)
+		LEFt JOIN Color c
+		ON (t.ColorID = c.ColorID)
+		WHERE (t.UserID = ?)
+		ORDER BY t.TagName;
 		");
 		$bq->execute([$User["UserID"]]);
 
@@ -34,6 +39,13 @@ class Tag
 			$obj = array();
 			$obj["TagID"] = $b["TagID"];
 			$obj["TagName"] = $b["TagName"];
+			$obj["IconID"] = $b["IconID"];
+			$obj["ColorID"] = $b["ColorID"];
+			$obj["ColorCode"] = $b["ColorCode"];
+			$obj["ColorName"] = $b["ColorName"];
+			$obj["TextCode"] = $b["TextCode"];
+			$obj["IconCode"] = $b["IconCode"];
+			$obj["IconName"] = $b["IconName"];
 
 			array_push($Out["Tags"], $obj);
 		}
@@ -57,11 +69,11 @@ class Tag
 
 		$bq = \utils\Database::GetDB()->prepare("
 		INSERT INTO Tag
-		(TagID, TagName, UserID)
+		(TagID, TagName, UserID, IconID, ColorID)
 		VALUES
-		(?, ?, ?);
+		(?, ?, ?, ?, ?);
 		");
-		$bq->execute([\utils\Database::GUID(), $Tag->TagName, $User["UserID"]]);
+		$bq->execute([\utils\Database::GUID(), $Tag->TagName, $Tag-IconID, $Tag->ColorID, $User["UserID"]]);
 
 
 		\utils\API::RespondSuccess("Success");
@@ -83,11 +95,11 @@ class Tag
 
 		$bq = \utils\Database::GetDB()->prepare("
 		UPDATE Tag
-		SET TagName = ?
+		SET TagName = ?, IconID = ?, ColorID = ?
 		WHERE (TagID = ?)
 		AND (UserID = ?)
 		");
-		$bq->execute([$Tag->TagName, $Tag->TagID, $User["UserID"]]);
+		$bq->execute([$Tag->TagName, $Tag->IconID, $Tag->ColorID, $Tag->TagID, $User["UserID"]]);
 
 
 		\utils\API::RespondSuccess("Success");
