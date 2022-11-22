@@ -19,6 +19,7 @@
         <q-item-section avatar v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode }">
           <q-avatar>
             <q-icon :name="l.IconCode" class="LocationIcon" size="xl" />
+            <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
           </q-avatar>
         </q-item-section>
 
@@ -37,12 +38,26 @@
         swipeable
         animated
         v-model="i.SelectedPhoto"
+        v-model:fullscreen="FullScreen"
         thumbnails
         infinite
         autoplay
-        v-if="i.Photos.length > 0"
-        clickable :to="'/item/' + i.ItemID">
+        v-if="i.Photos.length > 0">
+        
         <q-carousel-slide v-for="(p, index) in i.Photos" :key="p.PhotoID" :name="index" :img-src="p.PhotoData" />
+
+        <template v-slot:control>
+          <q-carousel-control
+            position="bottom-right"
+            :offset="[18, 18]"
+          >
+          <q-btn
+              push round dense color="white" text-color="primary"
+              :icon="FullScreen ? 'fullscreen_exit' : 'fullscreen'"
+              @click="FullScreen = !FullScreen;"
+            />
+          </q-carousel-control>
+        </template>
       </q-carousel>
     </q-card>
   </q-page>
@@ -62,6 +77,7 @@ export default {
   {
     return {
       Items: [],
+      FullScreen: false,
     };
   },
 
@@ -86,7 +102,7 @@ export default {
           {
             this.Items = response.Items;
 
-            this.Items.forEach(i => { i.SelectedPhoto = 0; })
+            this.Items.forEach(i => { i.SelectedPhoto = 0; i.FullScreen = false; })
           }).catch((e) =>
           {
             error.HandleError("Get items error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
