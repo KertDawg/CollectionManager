@@ -64,6 +64,7 @@
         </div>
         <div class="row">
           <div class="col-12">
+            <div class="ControlLabel">Description:</div>
             <q-editor v-model="Item.ItemDescription" min-height="5rem" />
           </div>
         </div>
@@ -423,6 +424,11 @@ export default {
 .ItemCard
 {
   min-width: 40%;
+}
+
+div.ControlLabel
+{
+  padding-top: 16px;
 }
 
 i.LocationIcon
