@@ -14,7 +14,7 @@
       </q-card-actions>
     </q-card>
 
-    <q-card v-masonry-tile class="InfoCard col-auto ItemCard" v-for="i in Items" :key="i.ItemID">
+    <q-card v-masonry-tile class="InfoCard ItemCard" v-for="i in Items" :key="i.ItemID">
       <q-item clickable :to="'/item/' + i.ItemID">
         <q-item-section avatar v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode }">
           <q-avatar>
@@ -99,9 +99,20 @@ export default {
 
 <style scoped>
 
-div.ItemCard
+@media (max-width: 1023px)
 {
-  min-width: 50%;
+  div.ItemCard
+  {
+    width: 90%;
+  }
+}
+
+@media (min-width: 1024px)
+{
+  div.ItemCard
+  {
+    width: 50%;
+  }
 }
 
 div.ItemName
