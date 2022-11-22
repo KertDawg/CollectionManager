@@ -14,7 +14,7 @@
       </q-card-actions>
     </q-card>
 
-    <q-card v-masonry-tile class="InfoCard col-auto" v-for="i in Items" :key="i.ItemID">
+    <q-card v-masonry-tile class="InfoCard col-auto ItemCard" v-for="i in Items" :key="i.ItemID">
       <q-item clickable :to="'/item/' + i.ItemID">
         <q-item-section avatar v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode }">
           <q-avatar>
@@ -33,9 +33,17 @@
         </q-item-section>
       </q-item>
 
-      <img v-for="p in i.Photos" :key="p.PhotoID" 
-            :src="p.PhotoData"
-            clickable :to="'/item/' + i.ItemID" />
+      <q-carousel
+        swipeable
+        animated
+        v-model="i.SelectedPhoto"
+        thumbnails
+        infinite
+        autoplay
+        v-if="i.Photos.length > 0"
+        clickable :to="'/item/' + i.ItemID">
+        <q-carousel-slide v-for="(p, index) in i.Photos" :key="p.PhotoID" :name="index" :img-src="p.PhotoData" />
+      </q-carousel>
     </q-card>
   </q-page>
 </template>
@@ -77,6 +85,8 @@ export default {
           .then((response) =>
           {
             this.Items = response.Items;
+
+            this.Items.forEach(i => { i.SelectedPhoto = 0; })
           }).catch((e) =>
           {
             error.HandleError("Get items error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
@@ -88,6 +98,11 @@ export default {
 </script>
 
 <style scoped>
+
+div.ItemCard
+{
+  min-width: 50%;
+}
 
 div.ItemName
 {
