@@ -62,6 +62,11 @@
               </q-select>
           </div>
         </div>
+        <div class="row">
+          <div class="col-12">
+            <q-editor v-model="Item.ItemDescription" min-height="5rem" />
+          </div>
+        </div>
       </q-card-section>
       <q-card-actions>
         <q-btn class="glossy" rounded color="primary" icon="save" @click="SaveItemClick()" />
@@ -179,7 +184,8 @@ export default {
     return {
       Item: {
         ItemID: "",
-        ItemName: "",        
+        ItemName: "",
+        ItemDescription: "",
       },
       Locations: [],
       Tags: [],
@@ -297,7 +303,6 @@ export default {
               .then((response) =>
               {
                 notification.ShowSuccess("The item was saved.");
-                this.$router.push("/home");
               }).catch((e) =>
               {
                 error.HandleError("Update item error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);

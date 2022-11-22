@@ -65,7 +65,7 @@ class Item
 		$Out = array();
 
 		$bq = \utils\Database::GetDB()->prepare("
-		SELECT i.ItemID, i.ItemName
+		SELECT i.ItemID, i.ItemName, i.ItemDescription
 		FROM Item i
 		WHERE (i.UserID = ?)
 		AND (i.ItemID = ?)
@@ -78,6 +78,7 @@ class Item
 			$obj = array();
 			$obj["ItemID"] = $b["ItemID"];
 			$obj["ItemName"] = $b["ItemName"];
+			$obj["ItemDescription"] = $b["ItemDescription"];
 
 			$obj["Tags"] = $Tag->GetTagsForItem($b["ItemID"]);
 			$obj["Locations"] = $Location->GetLocationsForItem($b["ItemID"]);
@@ -102,14 +103,15 @@ class Item
 
 		$POST = \utils\API::POST();
 		$Item = $POST->Item;
+		$Item->ItemID = \utils\Database::GUID();
 
 		$bq = \utils\Database::GetDB()->prepare("
 		INSERT INTO Item
-		(ItemID, ItemName, UserID)
+		(ItemID, ItemName, ItemDescription, UserID)
 		VALUES
-		(?, ?, ?);
+		(?, ?, ?, ?);
 		");
-		$bq->execute([\utils\Database::GUID(), $Item->ItemName, $User["UserID"]]);
+		$bq->execute([$Item->ItemID, $Item->ItemName, $Item->ItemDescription, $User["UserID"]]);
 
 		$Location = new Location();
 		$Location->SyncItemLocations($Item);
@@ -136,11 +138,11 @@ class Item
 
 		$bq = \utils\Database::GetDB()->prepare("
 		UPDATE Item
-		SET ItemName = ?
+		SET ItemName = ?, ItemDescription = ?
 		WHERE (ItemID = ?)
 		AND (UserID = ?)
 		");
-		$bq->execute([$Item->ItemName, $Item->ItemID, $User["UserID"]]);
+		$bq->execute([$Item->ItemName, $Item->ItemDescription, $Item->ItemID, $User["UserID"]]);
 
 		$Location = new Location();
 		$Location->SyncItemLocations($Item);
