@@ -20,6 +20,7 @@ class Item
 
 		$Tag = new Tag();
 		$Location = new Location();
+		$Photo = new Photo();
 		$Out = array();
 		$Out["Items"] = array();
 
@@ -39,6 +40,7 @@ class Item
 
 			$obj["Tags"] = $Tag->GetTagsForItem($b["ItemID"]);
 			$obj["Locations"] = $Location->GetLocationsForItem($b["ItemID"]);
+			$obj["Photos"] = $Photo->GetPhotosForItem($b["ItemID"]);
 
 			array_push($Out["Items"], $obj);
 		}
@@ -59,6 +61,7 @@ class Item
 
 		$Tag = new Tag();
 		$Location = new Location();
+		$Photo = new Photo();
 		$Out = array();
 
 		$bq = \utils\Database::GetDB()->prepare("
@@ -78,6 +81,7 @@ class Item
 
 			$obj["Tags"] = $Tag->GetTagsForItem($b["ItemID"]);
 			$obj["Locations"] = $Location->GetLocationsForItem($b["ItemID"]);
+			$obj["Photos"] = $Photo->GetPhotosForItem($b["ItemID"]);
 
 			$Out["Item"] = $obj;
 		}

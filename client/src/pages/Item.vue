@@ -1,9 +1,14 @@
 <template>
   <q-page v-masonry trsnsition-dureciton="0.3s" gutter="10" stagger="0.03s">
-    <q-card v-masonry-tile class="InfoCard col-auto">
+    <q-card v-masonry-tile class="InfoCard col-auto ItemCard">
       <q-card-section>
         <div class="row">
-          <div class="col text-h6">Item</div>
+          <div class="col-6 text-h6">Item</div>
+          <div class="col-6" align="right">
+            <q-btn class="glossy" rounded color="primary" label="Add" icon="add_a_photo" 
+              @click="SaveNewPhotoClick()"
+              v-if="!NewItemMode" />
+          </div>
         </div>
       </q-card-section>
       <q-card-section>
@@ -64,6 +69,17 @@
       </q-card-actions>
     </q-card>
 
+    <q-card v-masonry-tile class="InfoCard col-auto" v-for="p in Item.Photos" :key="p.PhotoID"
+      clickable @click="ShowLargePhoto(p)">
+      <q-card-section>
+        <div class="row">
+          <div class="col-12">
+            <img :src="p.PhotoData" class="Photo cursor-pointer" />
+          </div>
+        </div>
+      </q-card-section>
+    </q-card>
+
     <q-dialog v-model="ShowDeleteDialog">
       <q-card v-masonry-tile class="InfoCard col-auto">
         <q-card-section>
@@ -78,6 +94,71 @@
           <q-btn class="glossy" rounded label="cancel" v-close-popup />
           <q-btn class="glossy" rounded color="negative" label="Delete" @click="DeleteItemConfirmClick" />
         </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="ShowDeletePhotoDialog">
+      <q-card v-masonry-tile class="InfoCard col-auto">
+        <q-card-section>
+          <div class="row">
+            <div class="col text-h6">Delete Photo</div>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          Are you sure you want to delete this photo?
+        </q-card-section>
+        <q-card-actions>
+          <q-btn class="glossy" rounded label="Cancel" v-close-popup />
+          <q-btn class="glossy" rounded color="negative" label="Delete" @click="DeletePhotoConfirmClick" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="ShowNewPhotoDialog">
+      <q-card v-masonry-tile class="InfoCard col-auto">
+        <q-card-section>
+          <div class="row">
+            <div class="col text-h6">Add Photo</div>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <div id="PhotoInputParent">
+            <q-file
+                style="max-width: 300px"
+                v-model="NewPhotoModel"
+                filled
+                rounded
+                label="Photo"
+                accept="image/*"
+                capture="camera"
+                max-file-size="5120000"
+                @input="PhotoSelected"
+              >
+              <template v-slot:prepend>
+                <q-icon name="photo_camera" />
+              </template>
+            </q-file>
+          </div>
+        </q-card-section>
+        <q-card-actions>
+          <q-btn class="glossy" rounded label="Cancel" v-close-popup />
+          <q-btn class="glossy" rounded color="primary" label="Save" @click="SaveNewPhotoConfirmClick" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="ShowLargePhotoDialog">
+      <q-card class="InfoCard col-auto LargePhotoCard">
+        <div class="row">
+          <div class="col-auto">
+            <img :src="SelectedPhoto.PhotoData" class="LargePhoto" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-auto">
+            <q-btn class="glossy" rounded color="negative" icon="delete_forever" @click="DeletePhotoClick()" />
+          </div>
+        </div>
       </q-card>
     </q-dialog>
   </q-page>
@@ -102,8 +183,13 @@ export default {
       },
       Locations: [],
       Tags: [],
+      SelectedPhoto: {},
       NewItemMode: false,
       ShowDeleteDialog: false,
+      ShowDeletePhotoDialog: false,
+      ShowNewPhotoDialog: false,
+      ShowLargePhotoDialog: false,
+      NewPhotoModel: null,
     };
   },
 
@@ -238,6 +324,90 @@ export default {
                 error.HandleError("Delete item error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
               });
     },
+
+    DeletePhotoClick: function()
+    {
+      this.ShowDeletePhotoDialog = true;
+    },
+
+    DeletePhotoConfirmClick: function()
+    {
+      api.get("photo/delete/" + this.SelectedPhoto.PhotoID, this.$store)
+              .then((response) =>
+              {
+                notification.ShowSuccess("The photo was deleted.");
+                this.ShowDeletePhotoDialog = false;
+                this.ShowLargePhotoDialog = false;
+                this.CheckProperties();
+              }).catch((e) =>
+              {
+                error.HandleError("Delete photo error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+              });
+    },
+
+    SaveNewPhotoClick: function()
+    {
+      this.SelectedPhoto = {
+        PhotoID: "",
+        PhotoData: "",
+        ItemID: this.ItemID,
+      };
+
+      this.ShowNewPhotoDialog = true;
+    },
+
+    SaveNewPhotoConfirmClick: function()
+    {
+      if (this.SelectedPhoto.PhotoData.length < 2)
+      {
+        notification.ShowFailure("Select a photo.");
+      }
+      else
+      {
+        api.post("photo/add", { Photo: this.SelectedPhoto }, this.$store)
+            .then((response) =>
+            {
+              this.ShowNewPhotoDialog = false;
+              notification.ShowSuccess("The photo was added.");
+              this.CheckProperties();
+            }).catch((e) =>
+            {
+              error.HandleError("Add photo error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+            });
+      }
+    },
+
+    PhotoSelected: function()
+    {
+      var PhotoInputParent = document.getElementById("PhotoInputParent");
+      var PhotoInputs = PhotoInputParent.getElementsByTagName("input");
+      var PhotoInput = PhotoInputs[0];
+      var PhotoFiles = PhotoInput.files;
+
+      if (PhotoFiles.length > 0)
+      {
+        var PhotoFile = PhotoFiles[0];
+
+        this.SelectedPhoto.PhotoData = "";
+        const PhotoReader = new FileReader();
+        PhotoReader.addEventListener("load", (event) => {
+          this.SelectedPhoto.PhotoData += event.target.result;
+        });
+        PhotoReader.readAsDataURL(PhotoFile);
+      }
+      else
+      {
+        //  Clear stuff.
+        this.ReportPhotoModel = null;
+        this.SelectedPhoto.PhotoData = "";
+      }
+    },
+
+    ShowLargePhoto: function(Photo)
+    {
+      this.SelectedPhoto = Photo;
+      this.ShowLargePhotoDialog = true;
+    },
   },
 };
 
@@ -245,9 +415,31 @@ export default {
 
 <style scoped>
 
+.ItemCard
+{
+  min-width: 40%;
+}
+
 i.LocationIcon
 {
   padding-right: 8px;
+}
+
+img.Photo
+{
+  max-width: 100%;
+  max-height: 400px;
+}
+
+.LargePhotoCard
+{
+  padding: 8px;
+}
+
+img.LargePhoto
+{
+  max-width: 100%;
+  max-height: 80vh;
 }
 
 </style>

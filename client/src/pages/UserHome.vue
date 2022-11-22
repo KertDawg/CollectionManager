@@ -33,7 +33,9 @@
         </q-item-section>
       </q-item>
 
-      <img src="https://cdn.quasar.dev/img/parallax2.jpg" />
+      <img v-for="p in i.Photos" :key="p.PhotoID" 
+            :src="p.PhotoData"
+            clickable :to="'/item/' + i.ItemID" />
     </q-card>
   </q-page>
 </template>

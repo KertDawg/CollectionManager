@@ -105,6 +105,18 @@ $router->mount($APIBase, function() use ($router) {
 		});
 	});
 
+	$router->mount("/photo", function () use ($router) {
+		$router->post("/add", function () {
+			$Photo = new controllers\Photo();
+			$Photo->AddPhoto();
+		});
+
+		$router->get("/delete/{PhotoID}", function ($PhotoID) {
+			$Photo = new controllers\Photo();
+			$Photo->DeletePhoto($PhotoID);
+		});
+	});
+
 	$router->mount("/color", function () use ($router) {
 		$router->get("/", function () {
 			$Color = new controllers\Color();
