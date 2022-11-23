@@ -7,7 +7,7 @@
 #
 # Host: 192.168.1.34 (MySQL 8.0.31-0ubuntu0.22.04.1)
 # Database: Collections
-# Generation Time: 2022-11-21 20:41:30 +0000
+# Generation Time: 2022-11-23 00:31:41 +0000
 # ************************************************************
 
 
@@ -77,6 +77,8 @@ CREATE TABLE `Item` (
   `ItemID` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `ItemName` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `UserID` char(36) NOT NULL,
+  `ItemDescription` longtext NOT NULL,
+  `ItemCost` decimal(10,2) NOT NULL,
   PRIMARY KEY (`ItemID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

@@ -1,6 +1,6 @@
 {
     "require": {
-        "bramus/router": "^1.5",
+        "bramus/router": "1.5",
         "psr/cache": "^1.0",
         "psr/log": "^1.0"
     },

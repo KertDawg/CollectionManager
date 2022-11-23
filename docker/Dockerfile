@@ -8,9 +8,11 @@ RUN rm -rf *
 #  Update and install software.
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install -y unzip net-tools procps mariadb-server
+RUN apt-get install -y unzip net-tools procps mariadb-server libjpeg-dev libgd-dev
 RUN a2enmod rewrite
 RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install gd
+RUN docker-php-ext-configure gd --with-jpeg=/usr/lib/x86_64-linux-gnu
 
 #  Create folders.
 RUN mkdir -p /var/www/html/api

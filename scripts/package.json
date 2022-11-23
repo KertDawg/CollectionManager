@@ -1,0 +1,15 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "POTW Scripts",
+  "main": "index.js",
+  "scripts": {
+    "package": "node package.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "archiver": "^5.0.2",
+    "date-format": "^3.0.0"
+  }
+}
