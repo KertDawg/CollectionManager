@@ -145,7 +145,6 @@
                 rounded
                 label="Photo"
                 accept="image/*"
-                capture="camera"
                 max-file-size="5120000"
                 @input="PhotoSelected"
               >
