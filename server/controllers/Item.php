@@ -112,7 +112,7 @@ class Item
 		INSERT INTO Item
 		(ItemID, ItemName, ItemDescription, ItemCost, UserID)
 		VALUES
-		(?, ?, ?, ?);
+		(?, ?, ?, ?, ?);
 		");
 		$bq->execute([$Item->ItemID, $Item->ItemName, $Item->ItemDescription, $Item->ItemCost, $User["UserID"]]);
 
