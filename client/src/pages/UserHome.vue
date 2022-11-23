@@ -38,7 +38,7 @@
         swipeable
         animated
         v-model="i.SelectedPhoto"
-        v-model:fullscreen="FullScreen"
+        v-model:fullscreen="FullScreen[i.ItemID]"
         thumbnails
         infinite
         autoplay
@@ -53,8 +53,8 @@
           >
           <q-btn
               push round dense color="white" text-color="primary"
-              :icon="FullScreen ? 'fullscreen_exit' : 'fullscreen'"
-              @click="FullScreen = !FullScreen;"
+              :icon="FullScreen[i.ItemID] ? 'fullscreen_exit' : 'fullscreen'"
+              @click="FullScreen[i.ItemID] = !FullScreen[i.ItemID];"
             />
           </q-carousel-control>
         </template>
@@ -77,7 +77,7 @@ export default {
   {
     return {
       Items: [],
-      FullScreen: false,
+      FullScreen: [],
     };
   },
 
@@ -102,7 +102,7 @@ export default {
           {
             this.Items = response.Items;
 
-            this.Items.forEach(i => { i.SelectedPhoto = 0; i.FullScreen = false; })
+            this.Items.forEach(i => { i.SelectedPhoto = 0; this.FullScreen[i.ItemID] = false; })
           }).catch((e) =>
           {
             error.HandleError("Get items error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
