@@ -370,6 +370,7 @@ export default {
         ItemID: this.ItemID,
       };
 
+      this.NewPhotoModel = null;
       this.ShowNewPhotoDialog = true;
     },
 
