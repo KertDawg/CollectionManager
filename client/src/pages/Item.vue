@@ -64,6 +64,15 @@
         </div>
         <div class="row">
           <div class="col-12">
+            <q-input v-model="Item.ItemCost"
+                     type="number"
+                     prefix="$"
+                     label="Cost"
+                     @change="FormatCost" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
             <div class="ControlLabel">Description:</div>
             <q-editor v-model="Item.ItemDescription" min-height="5rem" />
           </div>
@@ -172,6 +181,7 @@
 
 <script>
 
+import numeral from "numeral";
 import api from "../utils/api";
 import error from "../utils/error";
 import notification from "../utils/notification";
@@ -187,6 +197,7 @@ export default {
         ItemID: "",
         ItemName: "",
         ItemDescription: "",
+        ItemCost: 0,
       },
       Locations: [],
       Tags: [],
@@ -413,6 +424,21 @@ export default {
     {
       this.SelectedPhoto = Photo;
       this.ShowLargePhotoDialog = true;
+    },
+
+    FormatCost: function()
+    {
+      var Output = "0";
+      
+      try
+      {
+        var Cost = numeral(this.Item.ItemCost);
+        Output = Cost.format("0,0.00");
+      }
+      catch
+      {}
+
+      this.Item.ItemCost = Output;
     },
   },
 };
