@@ -59,13 +59,12 @@
                     option-label="TagName"
                     @update:model-value="SelectNewChip">
               <template v-slot:option="{ itemProps, opt }">
-                <q-item v-bind="itemProps" v-if="!opt.IsTagUsedInThisItem">
+                <q-item v-bind="itemProps">
                   <q-item-section>
                     <div>
                       <q-chip
-                          dense
                           class="truncate-chip-labels"
-                          :outline="!opt.IsTagUsedInThisItem"
+                          outline
                           :style="!!opt.IsTagUsedInThisItem ? { 'background-color': '#ffffff', 'color': '#7f7f7f', 'width': 'auto', 'margin-left': opt.LeftPadding } : { 'background-color': opt.ColorCode, 'color': opt.TextCode, 'width': 'auto', 'margin-left': opt.LeftPadding }">
                         <q-icon class="ChipIcon" :style="{ 'color': (!!opt.IsTagUsedInThisItem ? '#7f7f7f' : opt.TextCode) }" :name="opt.IconCode" />
                         {{ opt.TagName }}
