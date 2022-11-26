@@ -19,22 +19,25 @@
 
     <q-card v-masonry-tile class="InfoCard col-auto">
       <q-card-section>
-        <q-list bordered>
-          <q-item v-for="t in Tags" :key="t.TagID">
-            <q-item-section>
-              <div class="row items-center TagEntry" :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }">
-                <q-icon :name="t.IconCode" class="TagIcon" size="xl" />
-                <div>{{ t.TagName }}</div>
-              </div>
-            </q-item-section>
-            <q-item-section side>
-              <q-btn class="glossy" rounded icon="edit" @click="EditTagClick(t)" />
-            </q-item-section>
-            <q-item-section side>
-              <q-btn class="glossy" rounded color="negative" icon="delete_forever" @click="DeleteTagClick(t)" />
-            </q-item-section>
-          </q-item>
-        </q-list>
+        <q-tree
+          :nodes="TagNodes"
+          default-expand-all
+          node-key="TagID"
+          children-key="Children"
+          ref="TagTree"
+          :duration="0">
+          <template v-slot:default-header="prop">
+            <div @click="ExpandTree">
+              <q-btn flat dense icon="add" @click="NewTagClick(prop.node)" />
+              <q-btn flat dense icon="edit" @click="EditTagClick(prop.node)" />
+              <q-btn flat dense icon="delete" @click="DeleteTagClick(prop.node)" />
+            </div>
+            <div class="row items-center TagTreeNode" :style="{ 'background-color': prop.node.ColorCode, 'color': prop.node.TextCode }" @click="ExpandTree">
+              <q-icon :name="prop.node.IconCode" class="TagTreeIcon" />
+              <div>{{ prop.node.TagName }}</div>
+            </div>
+          </template>
+        </q-tree>
       </q-card-section>
     </q-card>
 
@@ -135,6 +138,7 @@ export default {
   {
     return {
       Tags: [],
+      TagNodes: [],
       Colors: [],
       Icons: [],
       ShowEditDialog: false,
@@ -160,6 +164,8 @@ export default {
           .then((response) =>
           {
             this.Tags = response.Tags;
+            this.MakeTagNodes();
+            this.ExpandTree();
           }).catch((e) =>
           {
             error.HandleError("Get tags error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
@@ -219,12 +225,18 @@ export default {
       this.ShowEditDialog = true;
     },
 
-    NewTagClick: function()
+    NewTagClick: function(ParentTag)
     {
       this.SelectedTag = {
         TagID: "",
         TagName: "",
+        ParentTagID: "",
       };
+
+      if (typeof ParentTag !== "undefined")
+      {
+        this.SelectedTag.ParentTagID = ParentTag.TagID;
+      }
 
       this.SelectedColor = {
         ColorID: "",
@@ -298,6 +310,57 @@ export default {
                 error.HandleError("Delete tag error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
               });
     },
+
+    MakeTagNodes: function()
+    {
+      //  Get root tags
+      this.TagNodes = this.Tags.filter(t => { return (t.ParentTagID === ""); });
+      
+      this.TagNodes.forEach(t => {
+        this.MakeChildTags(t);
+      });
+
+      this.TagNodes.sort((a, b) => {
+        if (a.TagName > b.TagName)
+        {
+          return 1;
+        }
+        else if (a.TagName < b.TagName)
+        {
+          return -1;
+        }
+        else
+        {
+          return 0;
+        }
+      });
+    },
+
+    MakeChildTags: function(Parent)
+    {
+      Parent.Children = this.Tags.filter(c => { return (c.ParentTagID == Parent.TagID) });
+      Parent.Children.sort((a, b) => {
+        if (a.TagName > b.TagName)
+        {
+          return 1;
+        }
+        else if (a.TagName < b.TagName)
+        {
+          return -1;
+        }
+        else
+        {
+          return 0;
+        }
+      });
+
+      Parent.Children.forEach(c => { this.MakeChildTags(c); });
+    },
+
+    ExpandTree: function()
+    {
+      setTimeout(() => { this.$refs.TagTree.expandAll(); }, 10);
+    },
   },
 };
 
@@ -305,13 +368,14 @@ export default {
 
 <style scoped>
 
-div.TagEntry
+div.TagTreeNode
 {
   padding: 8px;
   margin-left: 16px;
+
 }
 
-i.TagIcon
+i.TagTreeIcon
 {
   padding-right: 8px;
 }

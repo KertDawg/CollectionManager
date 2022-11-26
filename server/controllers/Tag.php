@@ -23,7 +23,7 @@ class Tag
 
 		$bq = \utils\Database::GetDB()->prepare("
 		SELECT t.TagID, t.TagName, t.IconID, t.ColorID, c.ColorCode, c.ColorName, c.TextCode,
-		i.IconCode, i.IconName
+		i.IconCode, i.IconName, t.ParentTagID
 		FROM Tag t
 		LEFT JOIN Icon i
 		ON (t.IconID = i.IconID)
@@ -39,6 +39,7 @@ class Tag
 			$obj = array();
 			$obj["TagID"] = $b["TagID"];
 			$obj["TagName"] = $b["TagName"];
+			$obj["ParentTagID"] = $b["ParentTagID"];
 			$obj["IconID"] = $b["IconID"];
 			$obj["ColorID"] = $b["ColorID"];
 			$obj["ColorCode"] = $b["ColorCode"];
@@ -69,11 +70,11 @@ class Tag
 
 		$bq = \utils\Database::GetDB()->prepare("
 		INSERT INTO Tag
-		(TagID, TagName, IconID, ColorID, UserID)
+		(TagID, TagName, IconID, ColorID, ParentTagID, UserID)
 		VALUES
-		(?, ?, ?, ?, ?);
+		(?, ?, ?, ?, ?, ?);
 		");
-		$bq->execute([\utils\Database::GUID(), $Tag->TagName, $Tag->IconID, $Tag->ColorID, $User["UserID"]]);
+		$bq->execute([\utils\Database::GUID(), $Tag->TagName, $Tag->IconID, $Tag->ColorID, $Tag->ParentTagID, $User["UserID"]]);
 
 
 		\utils\API::RespondSuccess("Success");
@@ -95,11 +96,11 @@ class Tag
 
 		$bq = \utils\Database::GetDB()->prepare("
 		UPDATE Tag
-		SET TagName = ?, IconID = ?, ColorID = ?
+		SET TagName = ?, IconID = ?, ColorID = ?, ParentTagID = ?
 		WHERE (TagID = ?)
 		AND (UserID = ?)
 		");
-		$bq->execute([$Tag->TagName, $Tag->IconID, $Tag->ColorID, $Tag->TagID, $User["UserID"]]);
+		$bq->execute([$Tag->TagName, $Tag->IconID, $Tag->ColorID, $Tag->ParentTagID, $Tag->TagID, $User["UserID"]]);
 
 
 		\utils\API::RespondSuccess("Success");
@@ -180,7 +181,7 @@ class Tag
 
 		$iq = \utils\Database::GetDB()->prepare("
 		SELECT it.ItemTagID, t.TagID, t.TagName, t.IconID, t.ColorID, c.ColorCode, c.ColorName, c.TextCode,
-		i.IconCode, i.IconName
+		i.IconCode, i.IconName, t.ParentTagID
 		FROM ItemTag it
 		INNER JOIN Tag t
 		ON (it.TagID = t.TagID)
@@ -198,6 +199,7 @@ class Tag
 			$t = array();
 			$t["ItemTagID"] = $i["ItemTagID"];
 			$t["TagID"] = $i["TagID"];
+			$t["ParentTagID"] = $i["ParentTagID"];
 			$t["TagName"] = $i["TagName"];
 			$t["IconID"] = $i["IconID"];
 			$t["ColorID"] = $i["ColorID"];

@@ -42,24 +42,39 @@
         </div>
         <div class="row">
           <div class="col-12">
-            <q-select
-                v-model="Item.Tags"
-                multiple
-                :options="Tags"
-                option-value="TagID"
-                option-label="TagName"
-                label="Tags">
-                <template v-slot:option="{ itemProps, opt }">
-                  <q-item v-bind="itemProps">
-                    <q-item-section avatar :style="{ 'background-color': opt.ColorCode, 'color': opt.TextCode }">
-                      <q-icon :name="opt.IconCode" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>{{ opt.TagName }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
+            Tags:
+            <q-chip v-for="t in Item.Tags" :key="t.TagID"
+              outline
+              :style="{ 'background-color': t.ColorCode, 'color': t.TextCode, 'margin': '8px' }">
+              <q-icon class="ChipIcon" :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }" :name="t.IconCode" />
+              {{ t.TagName }}
+              <q-icon class="RemoveChipIcon" :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }" name="cancel" @click="RemoveChip(t)" />
+            </q-chip>
+            <q-select v-model="NewTag"
+                    :options="TagsOrdered"
+                    transition-show="scale"
+                    transition-hide="scale"
+                    options-dense
+                    option-value="TagID"
+                    option-label="TagName"
+                    @update:model-value="SelectNewChip">
+              <template v-slot:option="{ itemProps, opt }">
+                <q-item v-bind="itemProps" v-if="!opt.IsTagUsedInThisItem">
+                  <q-item-section>
+                    <div>
+                      <q-chip
+                          dense
+                          class="truncate-chip-labels"
+                          :outline="!opt.IsTagUsedInThisItem"
+                          :style="!!opt.IsTagUsedInThisItem ? { 'background-color': '#ffffff', 'color': '#7f7f7f', 'width': 'auto', 'margin-left': opt.LeftPadding } : { 'background-color': opt.ColorCode, 'color': opt.TextCode, 'width': 'auto', 'margin-left': opt.LeftPadding }">
+                        <q-icon class="ChipIcon" :style="{ 'color': (!!opt.IsTagUsedInThisItem ? '#7f7f7f' : opt.TextCode) }" :name="opt.IconCode" />
+                        {{ opt.TagName }}
+                      </q-chip>
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
           </div>
         </div>
         <div class="row">
@@ -200,6 +215,12 @@ export default {
       },
       Locations: [],
       Tags: [],
+      TagNodes: [],
+      TagsOrdered: [],
+      NewTag: {
+        TagID: "", 
+        TagName: "Add a tag...",
+      },
       SelectedPhoto: {},
       NewItemMode: false,
       ShowDeleteDialog: false,
@@ -230,7 +251,6 @@ export default {
   {
     this.CheckProperties();
     this.LoadLocations();
-    this.LoadTags();
   },
 
   methods:
@@ -257,7 +277,10 @@ export default {
           .then((response) =>
           {
             this.Item = response.Item;
-            this.NewItemMode = false;
+
+            this.LoadTags().then(() => {
+              this.NewItemMode = false;
+            });
           }).catch((e) =>
           {
             error.HandleError("Get item error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
@@ -278,14 +301,23 @@ export default {
 
     LoadTags: function()
     {
-      api.get("tag", this.$store)
+      return api.get("tag", this.$store)
           .then((response) =>
           {
             this.Tags = response.Tags;
-          }).catch((e) =>
-          {
-            error.HandleError("Get tags error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+            this.FlagUsedTags();
+            this.MakeTagNodes();
+            this.OrderTags();
           });
+    },
+
+    FlagUsedTags: function()
+    {
+      this.Tags.forEach(t => {
+        var MatchingTags = this.Item.Tags.filter(m => { return (m.TagID === t.TagID); });
+
+        t.IsTagUsedInThisItem = (MatchingTags.length > 0) ? 1 : 0;
+      });
     },
 
     SaveItemClick: function()
@@ -440,6 +472,107 @@ export default {
 
       this.Item.ItemCost = Output;
     },
+
+    SelectNewChip: function()
+    {
+      if (!this.NewTag.IsTagUsedInThisItem)
+      {
+        //  Flag the tag as having been used.
+        var MatchingTags = this.Tags.filter(t => { return (t.TagID.toString() === this.NewTag.TagID.toString()); } );
+        MatchingTags.forEach(t => { t.IsTagUsedInThisItem = 1; });
+
+        //  Add the new tag.
+        this.Item.Tags.push(this.NewTag);
+      }
+
+      this.NewTag = {
+        TagID: "",
+        TagName: "Add a tag...",
+      };
+    },
+
+    RemoveChip: function(Tag)
+    {
+      var IndexOfTagToRemove = this.Item.Tags.indexOf(Tag);
+
+      //  Remove "is used" flag so that it shows up in the select list.
+      var MatchingTags = this.Tags.filter(t => { return (t.TagID.toString() === Tag.TagID.toString()); } );
+      MatchingTags.forEach(t => { t.IsTagUsedInThisItem = 0; });
+
+      //  Remove the tag from the list of tags in this note.
+      if (IndexOfTagToRemove >= 0)
+      {
+        this.Item.Tags.splice(IndexOfTagToRemove, 1);
+      }
+    },
+
+    MakeTagNodes: function()
+    {
+      //  Get root tags
+      this.TagNodes = this.Tags.filter(t => { return (t.ParentTagID === ""); });
+      
+      this.TagNodes.forEach(t => {
+        this.MakeChildTags(t);
+      });
+
+      this.TagNodes.sort((a, b) => {
+        if (a.TagName > b.TagName)
+        {
+          return 1;
+        }
+        else if (a.TagName < b.TagName)
+        {
+          return -1;
+        }
+        else
+        {
+          return 0;
+        }
+      });
+    },
+
+    MakeChildTags: function(Parent)
+    {
+      Parent.Children = this.Tags.filter(c => { return (c.ParentTagID == Parent.TagID) });
+      Parent.Children.sort((a, b) => {
+        if (a.TagName > b.TagName)
+        {
+          return 1;
+        }
+        else if (a.TagName < b.TagName)
+        {
+          return -1;
+        }
+        else
+        {
+          return 0;
+        }
+      });
+
+      Parent.Children.forEach(c => { this.MakeChildTags(c); });
+    },
+
+    OrderTags: function()
+    {
+      this.TagsOrdered = [];
+
+      this.TagNodes.forEach(tn => {
+        tn.Level = 0;
+        tn.LeftPadding = "0px";
+        this.TagsOrdered.push(tn);
+        this.OrderChildTags(tn, 1);
+      });
+    },
+
+    OrderChildTags: function(ParentTag, Level)
+    {
+      ParentTag.Children.forEach(pt => {
+        pt.Level = Level;
+        pt.LeftPadding = (Level * 12) + "px";
+        this.TagsOrdered.push(pt);
+        this.OrderChildTags(pt, Level + 1);
+      });
+    },
   },
 };
 
@@ -460,6 +593,30 @@ div.ControlLabel
 i.LocationIcon
 {
   padding-right: 8px;
+}
+
+div.TagTreeNode
+{
+  padding: 8px;
+  margin-left: 16px;
+
+}
+
+i.TagTreeIcon
+{
+  padding-right: 8px;
+}
+
+i.ChipIcon
+{
+  margin-right: 8px;
+  font-size: x-large;
+}
+
+i.RemoveChipIcon
+{
+  margin-left: 8px;
+  font-size: x-large;
 }
 
 img.Photo
