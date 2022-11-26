@@ -29,11 +29,11 @@ export function GetAppVersion(state)
 {
   if (state.AppVersion !== undefined)
   {
-    return !!state.AppVersion;
+    return state.AppVersion;
   }
   else
   {
-    return !!state.User.AppVersion
+    return state.User.AppVersion
   }
 }
 

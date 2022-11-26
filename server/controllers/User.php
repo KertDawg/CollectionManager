@@ -24,8 +24,10 @@ class User
 		}
 
 		$uq = \utils\Database::GetDB()->prepare("
-		SELECT u.UserID, u.UserName, u.PasswordHash, u.Admin
+		SELECT u.UserID, u.UserName, u.PasswordHash, COALESCE(s.`Value`, '') AS AppVersion, u.Admin
 		FROM User u 
+		LEFT JOIN Setting s
+		ON (s.`Key` = 'AppVersion')
 		WHERE (u.UserName = ?)
 		AND (u.Active <> 0);");
 		$uq->execute([$UserName]);
@@ -41,7 +43,8 @@ class User
 					"UserID" => $user["UserID"],
 					"UserName" => $user["UserName"],
 					"Token" => static::BuildCookie($user),
-					"Admin" => $user["Admin"]
+					"Admin" => $user["Admin"],
+					"AppVersion" => $user["AppVersion"]
 				);
 
 				\utils\Log::LogEvent(\utils\Log::SEVERITY_INFORMATION, \utils\Log::TYPE_LOGINSUCCESS, $user["UserID"], "Successful login.");
@@ -106,8 +109,10 @@ class User
 
 		//  Read the user record.
 		$uq = \utils\Database::GetDB()->prepare("
-		SELECT u.UserID, u.UserName, u.Admin
+		SELECT u.UserID, u.UserName, u.Admin, COALESCE(s.`Value`, '') AS AppVersion, u.Admin
 		FROM User u
+		LEFT JOIN Setting s
+		ON (s.`Key` = 'AppVersion')
 		WHERE (u.UserID = ?);
 		");
 		$uq->execute([$Object->UserID]);
@@ -121,6 +126,7 @@ class User
 				"UserName" => $user["UserName"],
 				"Token" => static::BuildCookie($user),
 				"Admin" => $user["Admin"],
+				"AppVersion" => $user["AppVersion"],
 			);
 		}
 

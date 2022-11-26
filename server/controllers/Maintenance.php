@@ -7,48 +7,23 @@ require __DIR__ . "/../Configuration.php";
 
 class Maintenance
 {
-	private $DB = "";
-
-
 	public function GenerateNewAppVersionGUID()
 	{
-		$this->DB = \utils\Database::GetDB();
 		$AppVersionGUID = \utils\Database::GUID();
 
-		//  Check for existing app version.
-		$eavq = $this->DB->query("
-		SELECT Value
-		FROM Setting
-		WHERE (Key = 'AppVersion');
+		$uq = \utils\Database::GetDB()->prepare("
+		DELETE FROM Setting
+		WHERE (`Key` = 'AppVersion');
 		");
-		$meav = $eavq->fetchAll(\PDO::FETCH_ASSOC);
-		$DoesRecordExist = false;
+		$uq->execute([]);
 
-		foreach($meav as $v) {
-			$DoesRecordExist = true;
-		}
-
-		if (!$DoesRecordExist)
-		{
-			//  Insert the record.
-			$q2 = $this->DB->prepare("
-			INSERT INTO Setting
-			(Key, Value)
-			VALUES 
-			('AppVersion', ?);
-			");
-			$q2->execute([$AppVersionGUID]);
-		}
-		else
-		{
-			//  Update the existing record.
-			$q2 = $this->DB->prepare("
-			UPDATE Setting
-			SET Value = ?
-			WHERE (Key = 'AppVersion');
-			");
-			$q2->execute([$AppVersionGUID]);
-		}
+		$uq = \utils\Database::GetDB()->prepare("
+		INSERT INTO Setting
+		(`Key`, `Value`)
+		VALUES
+		('AppVersion', ?);
+		");
+		$uq->execute([$AppVersionGUID]);
 	}
 
 	public function FirstTimeSetup()

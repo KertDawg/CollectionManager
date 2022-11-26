@@ -139,11 +139,6 @@ $router->mount($APIBase, function() use ($router) {
 			$User = new controllers\User();
 			$User->ValidateUser($Token);
 		});
-
-		$router->get("/", function () {
-			$User = new controllers\User();
-			$User->GetUserNames();
-		});
 	});
 });
 

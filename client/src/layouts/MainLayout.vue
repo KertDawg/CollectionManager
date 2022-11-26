@@ -101,21 +101,21 @@ export default {
     };
   },
 
-  $route(to, from)
+  watch:
   {
-    //  Log the user in if there's a cookie.
-    this.$store.dispatch("user/LoadCookie");
-
-    //  Clear any component themes.
-    this.SetComponentTheme("");
-
-    //  Make sure that the token is valid.
-    api.check(this.$store)
-    .catch(function (error)
+    $route(to, from)
     {
-      //  The token has expired or something.
-      this.LogOutClick();
-    });
+      //  Log the user in if there's a cookie.
+      this.$store.dispatch("user/LoadCookie");
+
+      //  Make sure that the token is valid.
+      api.check(this.$store)
+      .catch(function (error)
+      {
+        //  The token has expired or something.
+        this.LogOutClick();
+      });
+    },
   },
 
   mounted()
