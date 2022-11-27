@@ -68,13 +68,22 @@ class Tag
 		$POST = \utils\API::POST();
 		$Tag = $POST->Tag;
 
+		if (is_null($Tag->ParentTagID))
+		{
+			$ParentTagID = "";
+		}
+		else
+		{
+			$ParentTagID = $Tag->ParentTagID;
+		}
+
 		$bq = \utils\Database::GetDB()->prepare("
 		INSERT INTO Tag
 		(TagID, TagName, IconID, ColorID, ParentTagID, UserID)
 		VALUES
 		(?, ?, ?, ?, ?, ?);
 		");
-		$bq->execute([\utils\Database::GUID(), $Tag->TagName, $Tag->IconID, $Tag->ColorID, $Tag->ParentTagID, $User["UserID"]]);
+		$bq->execute([\utils\Database::GUID(), $Tag->TagName, $Tag->IconID, $Tag->ColorID, $ParentTagID, $User["UserID"]]);
 
 
 		\utils\API::RespondSuccess("Success");
