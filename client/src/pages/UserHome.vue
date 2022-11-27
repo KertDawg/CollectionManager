@@ -7,14 +7,72 @@
         </div>
       </q-card-section>
       <q-card-section>
-        See your items here.
+        <div class="row">
+          <div class="col-12">
+            <q-input 
+              label="Filter"
+              v-model="TextFilter"
+              clearable
+              @update:model-value="TextFilterChange" />
+          </div>
+        </div>
+        <div class="row q-pt-lg" v-if="TagFilter !== ''">
+          <div class="col-md-8">
+            Tag:
+            <q-chip
+                v-if="TagFilter !== ''"
+                class="truncate-chip-labels"
+                outline
+                :style="{ 'background-color': TagFilter.ColorCode, 'color': TagFilter.TextCode, 'width': 'auto' }">
+              <q-icon class="ChipIcon" :style="{ 'color': TagFilter.TextCode }" :name="TagFilter.IconCode" />
+              {{ TagFilter.TagName }}
+            </q-chip>
+          </div>
+          <div class="col-md-4">
+            <q-btn 
+              icon="cancel"
+              flat
+              dense
+              @click="TagFilter = ''; SelectTagFilter();"
+              style="color: #00000050;"
+            />
+          </div>
+        </div>
+        <div class="row q-pt-lg">
+          <div class="col-12">
+            <q-select v-model="TagFilter"
+                    :options="TagsOrdered"
+                    transition-show="scale"
+                    transition-hide="scale"
+                    options-dense
+                    option-value="TagID"
+                    option-label="TagName"
+                    @update:model-value="SelectTagFilter">
+              <template v-slot:option="{ itemProps, opt }">
+                <q-item v-bind="itemProps">
+                  <q-item-section>
+                    <div>
+                      <q-chip
+                          class="truncate-chip-labels"
+                          outline
+                          :style="{ 'background-color': opt.ColorCode, 'color': opt.TextCode, 'width': 'auto', 'margin-left': opt.LeftPadding }">
+                        <q-icon class="ChipIcon" :style="{ 'color': opt.TextCode }" :name="opt.IconCode" />
+                        {{ opt.TagName }}
+                      </q-chip>
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+          </div>
+        </div>
       </q-card-section>
       <q-card-actions>
         <q-btn class="glossy" rounded color="primary" label="Add a New Item" to="/item/new" />
       </q-card-actions>
     </q-card>
 
-    <q-card v-masonry-tile class="InfoCard ItemCard" v-for="i in Items" :key="i.ItemID">
+    <q-card v-masonry-tile class="InfoCard ItemCard" v-for="i in FilteredItems" :key="i.ItemID">
       <q-item clickable :to="'/item/' + i.ItemID">
         <q-item-section avatar v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode }">
           <q-avatar>
@@ -77,7 +135,14 @@ export default {
   {
     return {
       Items: [],
+      FilteredItems: [],
       FullScreen: [],
+      Locations: [],
+      Tags: [],
+      TagNodes: [],
+      TagsOrdered: [],
+      TextFilter: "",
+      TagFilter: "",
     };
   },
 
@@ -90,6 +155,8 @@ export default {
     else
     {
       this.LoadItems();
+      this.LoadLocations();
+      this.LoadTags();
     }
   },
 
@@ -101,12 +168,166 @@ export default {
           .then((response) =>
           {
             this.Items = response.Items;
+            this.FilterItems();
 
             this.Items.forEach(i => { i.SelectedPhoto = 0; this.FullScreen[i.ItemID] = false; })
           }).catch((e) =>
           {
             error.HandleError("Get items error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
           });
+    },
+
+    LoadLocations: function()
+    {
+      api.get("location", this.$store)
+          .then((response) =>
+          {
+            this.Locations = response.Locations;
+          }).catch((e) =>
+          {
+            error.HandleError("Get locations error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
+          });
+    },
+
+    LoadTags: function()
+    {
+      return api.get("tag", this.$store)
+          .then((response) =>
+          {
+            this.Tags = response.Tags;
+            this.MakeTagNodes();
+            this.OrderTags();
+          });
+    },
+
+    FilterItems: function()
+    {
+      if (this.TextFilter == null)
+      {
+        this.TextFilter = "";
+      }
+
+      var TextFilterLC = this.TextFilter.toLowerCase();
+
+      this.FilteredItems = this.Items.filter(i => {
+        if (this.TextFilter.length > 1)
+        {
+          if (i.ItemName.toLowerCase().indexOf(TextFilterLC) >= 0)
+          {
+            return true;
+          }
+          else
+          {
+            return false;
+          }
+        }
+        else
+        {
+          return true;
+        }
+      });
+
+      this.FilteredItems = this.FilteredItems.filter(i => {
+        if (this.TagFilter !== "")
+        {
+          var MatchingTags = i.Tags.filter(t => {
+            return (t.TagID === this.TagFilter.TagID);
+          });
+
+          if (MatchingTags.length > 0)
+          {
+            return true;
+          }
+          else
+          {
+            return false;
+          }
+        }
+        else
+        {
+          return true;
+        }
+      });
+
+      setTimeout(() => { this.$redrawVueMasonry() }, 100);
+    },
+
+    TextFilterChange: function()
+    {
+      this.FilterItems();
+    },
+
+    SelectTagFilter: function()
+    {
+      this.FilterItems();
+    },
+
+    MakeTagNodes: function()
+    {
+      //  Get root tags
+      this.TagNodes = this.Tags.filter(t => { return (t.ParentTagID === ""); });
+      
+      this.TagNodes.forEach(t => {
+        this.MakeChildTags(t);
+      });
+
+      this.TagNodes.sort((a, b) => {
+        if (a.TagName > b.TagName)
+        {
+          return 1;
+        }
+        else if (a.TagName < b.TagName)
+        {
+          return -1;
+        }
+        else
+        {
+          return 0;
+        }
+      });
+    },
+
+    MakeChildTags: function(Parent)
+    {
+      Parent.Children = this.Tags.filter(c => { return (c.ParentTagID == Parent.TagID) });
+      Parent.Children.sort((a, b) => {
+        if (a.TagName > b.TagName)
+        {
+          return 1;
+        }
+        else if (a.TagName < b.TagName)
+        {
+          return -1;
+        }
+        else
+        {
+          return 0;
+        }
+      });
+
+      Parent.Children.forEach(c => { this.MakeChildTags(c); });
+    },
+
+    OrderTags: function()
+    {
+      this.TagsOrdered = [];
+
+      this.TagNodes.forEach(tn => {
+        tn.Level = 0;
+        tn.LeftPadding = "0px";
+        this.TagsOrdered.push(tn);
+        this.OrderChildTags(tn, 1);
+      });
+    },
+
+    OrderChildTags: function(ParentTag, Level)
+    {
+      ParentTag.Children.forEach(pt => {
+        pt.Level = Level;
+        pt.LeftPadding = (Level * 12) + "px";
+        this.TagsOrdered.push(pt);
+        this.OrderChildTags(pt, Level + 1);
+      });
     },
   },
 };
