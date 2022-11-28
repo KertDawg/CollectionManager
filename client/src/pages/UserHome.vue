@@ -77,6 +77,8 @@
         expand-separator
         switch-toggle-side
         :label="i.ItemName"
+        @after-show="RedrawMasonry"
+        @after-hide="RedrawMasonry"
       >
         <template v-slot:header>
           <div class="row LargeRow" clickable :to="'/item/' + i.ItemID">
@@ -102,25 +104,31 @@
             </div>
           </div>
 
-          <div class="row SmallRow" clickable :to="'/item/' + i.ItemID">
-            <div class="col-auto">
-              <q-item-label class="SmallItemName">{{ i.ItemName }}</q-item-label>
-              <img :src="i.Photos[0].PhotoData" class="HeaderPhoto" v-if="i.Photos.length > 0" />
+          <div>
+            <div class="row SmallRow text-center" clickable :to="'/item/' + i.ItemID">
+              <div class="col-12">
+                <q-item-label class="SmallItemName">{{ i.ItemName }}</q-item-label>
+              </div>
             </div>
-            <div class="col-auto q-ml-xs" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
-              <q-item-label>
-                <q-avatar>
-                  <q-icon :name="l.IconCode" class="LocationIcon" size="md" />
-                  <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
-                </q-avatar>
-              </q-item-label>
-              <q-item-label v-for="t in i.Tags" :key="t.TagID">
-                <q-chip :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }"
-                        class="glossy" :color="t.ColorCode" :text-color="t.TextCode" :icon="t.IconCode"
-                        dense>
-                  {{ t.TagName }}
-                </q-chip>
-              </q-item-label>
+            <div class="row SmallRow" clickable :to="'/item/' + i.ItemID">
+              <div class="col-auto">
+                <img :src="i.Photos[0].PhotoData" class="HeaderPhoto" v-if="i.Photos.length > 0" />
+              </div>
+              <div class="col-auto q-ml-xs" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
+                <q-item-label>
+                  <q-avatar>
+                    <q-icon :name="l.IconCode" class="LocationIcon" size="md" />
+                    <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
+                  </q-avatar>
+                </q-item-label>
+                <q-item-label v-for="t in i.Tags" :key="t.TagID">
+                  <q-chip :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }"
+                          class="glossy" :color="t.ColorCode" :text-color="t.TextCode" :icon="t.IconCode"
+                          dense size="sm">
+                    {{ t.TagName }}
+                  </q-chip>
+                </q-item-label>
+              </div>
             </div>
           </div>
         </template>
@@ -232,6 +240,11 @@ export default {
             this.MakeTagNodes();
             this.OrderTags();
           });
+    },
+
+    RedrawMasonry: function()
+    {
+      setTimeout(() => { this.$redrawVueMasonry() }, 100);
     },
 
     FilterItems: function()
@@ -374,12 +387,12 @@ export default {
 {
   div.ItemCard
   {
-    width: 90%;
+    width: 94%;
   }
 
   div.SmallRow
   {
-    display: auto;
+    display: flex;
     width: 100%;
   }
 
@@ -403,7 +416,7 @@ export default {
 
   div.LargeRow
   {
-    display: auto;
+    display: flex;
     width: 100%;
   }
 }
@@ -427,8 +440,8 @@ div.LargeItemName
 
 img.HeaderPhoto
 {
-  max-width: 120px;
-  max-height: 80px;
+  max-width: 60px;
+  max-height: 60px;
 }
 
 </style>
