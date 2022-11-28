@@ -1,1 +1,10 @@
 // app global css in SCSS form
+
+div.q-expansion-item
+{
+    div.q-focus-helper
+    {
+      visibility: hidden;
+    }
+}
+

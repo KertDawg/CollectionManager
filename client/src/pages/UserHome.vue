@@ -73,50 +73,84 @@
     </q-card>
 
     <q-card v-masonry-tile class="InfoCard ItemCard" v-for="i in FilteredItems" :key="i.ItemID">
-      <q-item clickable :to="'/item/' + i.ItemID">
-        <q-item-section avatar v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode }">
-          <q-avatar>
-            <q-icon :name="l.IconCode" class="LocationIcon" size="xl" />
-            <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
-          </q-avatar>
-        </q-item-section>
+      <q-expansion-item
+        expand-separator
+        switch-toggle-side
+        :label="i.ItemName"
+      >
+        <template v-slot:header>
+          <div class="row LargeRow" clickable :to="'/item/' + i.ItemID">
+            <div class="col-md-2" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
+              <q-avatar>
+                <q-icon :name="l.IconCode" class="LocationIcon" size="xl" />
+                <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
+              </q-avatar>
+            </div>
 
-        <q-item-section>
-          <q-item-label class="ItemName">{{ i.ItemName }}</q-item-label>
-          <q-item-label>
-            <q-chip v-for="t in i.Tags" :key="t.TagID" :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }"
-                    class="glossy" :color="t.ColorCode" :text-color="t.TextCode" :icon="t.IconCode">
-              {{ t.TagName }}
-            </q-chip>
-          </q-item-label>
-        </q-item-section>
-      </q-item>
+            <div class="col-md-8">
+              <q-item-label class="LargeItemName">{{ i.ItemName }}</q-item-label>
+              <q-item-label>
+                <q-chip v-for="t in i.Tags" :key="t.TagID" :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }"
+                        class="glossy" :color="t.ColorCode" :text-color="t.TextCode" :icon="t.IconCode">
+                  {{ t.TagName }}
+                </q-chip>
+              </q-item-label>
+            </div>
 
-      <q-carousel
-        swipeable
-        animated
-        v-model="i.SelectedPhoto"
-        v-model:fullscreen="FullScreen[i.ItemID]"
-        thumbnails
-        infinite
-        autoplay
-        v-if="i.Photos.length > 0">
-        
-        <q-carousel-slide v-for="(p, index) in i.Photos" :key="p.PhotoID" :name="index" :img-src="p.PhotoData" />
+            <div class="col-md-2 PhotoColumn">
+              <img :src="i.Photos[0].PhotoData" class="HeaderPhoto" v-if="i.Photos.length > 0" />
+            </div>
+          </div>
 
-        <template v-slot:control>
-          <q-carousel-control
-            position="bottom-right"
-            :offset="[18, 18]"
-          >
-          <q-btn
-              push round dense color="white" text-color="primary"
-              :icon="FullScreen[i.ItemID] ? 'fullscreen_exit' : 'fullscreen'"
-              @click="FullScreen[i.ItemID] = !FullScreen[i.ItemID];"
-            />
-          </q-carousel-control>
+          <div class="row SmallRow" clickable :to="'/item/' + i.ItemID">
+            <div class="col-auto">
+              <q-item-label class="SmallItemName">{{ i.ItemName }}</q-item-label>
+              <img :src="i.Photos[0].PhotoData" class="HeaderPhoto" v-if="i.Photos.length > 0" />
+            </div>
+            <div class="col-auto q-ml-xs" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
+              <q-item-label>
+                <q-avatar>
+                  <q-icon :name="l.IconCode" class="LocationIcon" size="md" />
+                  <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
+                </q-avatar>
+              </q-item-label>
+              <q-item-label v-for="t in i.Tags" :key="t.TagID">
+                <q-chip :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }"
+                        class="glossy" :color="t.ColorCode" :text-color="t.TextCode" :icon="t.IconCode"
+                        dense>
+                  {{ t.TagName }}
+                </q-chip>
+              </q-item-label>
+            </div>
+          </div>
         </template>
-      </q-carousel>
+
+        <q-carousel
+          swipeable
+          animated
+          v-model="i.SelectedPhoto"
+          v-model:fullscreen="FullScreen[i.ItemID]"
+          thumbnails
+          infinite
+          autoplay
+          v-if="i.Photos.length > 0">
+          
+          <q-carousel-slide v-for="(p, index) in i.Photos" :key="p.PhotoID" :name="index" :img-src="p.PhotoData" />
+
+          <template v-slot:control>
+            <q-carousel-control
+              position="bottom-right"
+              :offset="[18, 18]"
+            >
+            <q-btn
+                push round dense color="white" text-color="primary"
+                :icon="FullScreen[i.ItemID] ? 'fullscreen_exit' : 'fullscreen'"
+                @click="FullScreen[i.ItemID] = !FullScreen[i.ItemID];"
+              />
+            </q-carousel-control>
+          </template>
+        </q-carousel>
+      </q-expansion-item>
     </q-card>
   </q-page>
 </template>
@@ -342,6 +376,17 @@ export default {
   {
     width: 90%;
   }
+
+  div.SmallRow
+  {
+    display: auto;
+    width: 100%;
+  }
+
+  div.LargeRow
+  {
+    display: none;
+  }
 }
 
 @media (min-width: 1024px)
@@ -350,12 +395,40 @@ export default {
   {
     width: 50%;
   }
+
+  div.SmallRow
+  {
+    display: none;
+  }
+
+  div.LargeRow
+  {
+    display: auto;
+    width: 100%;
+  }
 }
 
-div.ItemName
+div.PhotoColumn
+{
+  text-align: right;
+}
+
+div.SmallItemName
+{
+  font-size: normal;
+  font-weight: bold;
+}
+
+div.LargeItemName
 {
   font-size: x-large;
   font-weight: bold;
+}
+
+img.HeaderPhoto
+{
+  max-width: 120px;
+  max-height: 80px;
 }
 
 </style>
