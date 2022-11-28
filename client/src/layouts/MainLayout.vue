@@ -113,7 +113,9 @@ export default {
       .catch(function (error)
       {
         //  The token has expired or something.
-        this.LogOutClick();
+        this.ShowLogoutDialog = false;
+        this.$store.commit("user/LogOutUser");
+        this.$router.push("/home");
       });
     },
   },
