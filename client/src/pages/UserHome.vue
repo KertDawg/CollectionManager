@@ -144,6 +144,15 @@
           rounded glossy 
           class="q-mb-md q-ml-sm" 
           @click="$router.push('/item/' + i.ItemID);" />
+          
+        <q-btn 
+          label="View" 
+          icon="visibility" 
+          color="primary" 
+          rounded glossy 
+          class="q-mb-md q-ml-sm" 
+          @click="$router.push('/view/' + i.ItemID);" />
+          
         <q-carousel
           swipeable
           animated

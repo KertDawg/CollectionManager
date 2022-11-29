@@ -10,6 +10,7 @@ const routes = [
       { name: "tags", path: "tags", component: () => import("pages/Tags.vue") },
       { name: "locations", path: "locations", component: () => import("pages/Locations.vue") },
       { name: "item", path: "item/:ItemID", component: () => import("pages/Item.vue"), props: true },
+      { name: "view", path: "view/:ItemID", component: () => import("pages/ItemView.vue"), props: true },
     ]
   },
 
