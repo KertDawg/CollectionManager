@@ -460,6 +460,12 @@ div.LargeItemName
   font-weight: bold;
 }
 
+i.ChipIcon
+{
+  margin-right: 8px;
+  font-size: x-large;
+}
+
 img.HeaderPhoto
 {
   max-width: 60px;
