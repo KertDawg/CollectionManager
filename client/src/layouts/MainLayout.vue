@@ -115,7 +115,9 @@ export default {
         //  The token has expired or something.
         this.ShowLogoutDialog = false;
         this.$store.commit("user/LogOutUser");
-        this.$router.push("/home");
+
+        //  Reload the app.
+        document.location.reload();
       });
     },
   },

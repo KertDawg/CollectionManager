@@ -32,6 +32,9 @@ export default {
 
   mounted()
   {
+    //  Log the user in if there's a cookie.
+    this.$store.dispatch("user/LoadCookie");
+
     if (this.$store.getters["user/IsLoggedIn"])
     {
       this.$router.push("/home");
