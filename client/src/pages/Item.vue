@@ -1,6 +1,13 @@
 <template>
   <q-page v-masonry trsnsition-dureciton="0.3s" gutter="10" stagger="0.03s">
-    <q-card v-masonry-tile class="InfoCard col-auto ItemCard">
+    <div class="fullscreen text-center q-pa-md flex flex-center" v-if="!PageLoaded">
+      <q-spinner-grid
+        color="primary"
+        size="10em"
+      />
+    </div>
+
+    <q-card v-masonry-tile v-if="PageLoaded" class="InfoCard col-auto ItemCard">
       <q-card-section>
         <div class="row">
           <div class="col-6 text-h6">Item</div>
@@ -227,6 +234,7 @@ export default {
       ShowNewPhotoDialog: false,
       ShowLargePhotoDialog: false,
       NewPhotoModel: null,
+      PageLoaded: false,
     };
   },
 
@@ -242,12 +250,14 @@ export default {
   {
     $route(to, from)
     {
+      this.PageLoaded = false;
       this.CheckProperties();
     },
   },
 
   mounted()
   {
+    this.PageLoaded = false;
     this.CheckProperties();
     this.LoadLocations();
   },
@@ -259,6 +269,7 @@ export default {
       if (this.ItemID.toLocaleLowerCase() === "new")
       {
         this.NewItemMode = true;
+        this.PageLoaded = true;
       }
       else if (this.ItemID.length > 10)
       {
@@ -279,6 +290,7 @@ export default {
 
             this.LoadTags().then(() => {
               this.NewItemMode = false;
+              this.PageLoaded = true;
             });
           }).catch((e) =>
           {

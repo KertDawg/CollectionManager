@@ -1,6 +1,13 @@
 <template>
   <q-page v-masonry trsnsition-dureciton="0.3s" gutter="10" stagger="0.03s">
-    <q-card v-masonry-tile class="InfoCard col-auto">
+    <div class="fullscreen text-center q-pa-md flex flex-center" v-if="!PageLoaded">
+      <q-spinner-grid
+        color="primary"
+        size="10em"
+      />
+    </div>
+
+    <q-card v-masonry-tile v-if="PageLoaded" class="InfoCard col-auto">
       <q-card-section>
         <div class="row">
           <div class="col text-h6">Items</div>
@@ -76,20 +83,21 @@
       <q-expansion-item
         expand-separator
         switch-toggle-side
+        :dense="$q.screen.lt.sm"
         :label="i.ItemName"
         @after-show="RedrawMasonry"
         @after-hide="RedrawMasonry"
       >
         <template v-slot:header>
-          <div v-if="!$q.screen.lt.sm" class="row">
-            <div class="col-md-2 q-mr-md" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
+          <div v-if="!$q.screen.lt.sm" class="row" style="width: 100%">
+            <div class="col-2 q-mr-md" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
               <q-avatar>
                 <q-icon :name="l.IconCode" class="LocationIcon" size="xl" />
                 <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
               </q-avatar>
             </div>
 
-            <div class="col-md-8">
+            <div class="col-7">
               <q-item-label class="LargeItemName">
                 {{ i.ItemName }}
               </q-item-label>
@@ -101,13 +109,13 @@
               </q-item-label>
             </div>
 
-            <div class="col-md-2 PhotoColumn">
+            <div class="col-2 PhotoColumn">
               <img :src="i.Photos[0].PhotoData" class="HeaderPhoto" v-if="i.Photos.length > 0" />
             </div>
           </div>
 
-          <div v-if="$q.screen.lt.sm" width="100%">
-            <div class="row text-center" clickable :to="'/item/' + i.ItemID">
+          <div v-if="$q.screen.lt.sm">
+            <div class="row" clickable :to="'/item/' + i.ItemID">
               <div class="col-12">
                 <q-item-label class="SmallItemName">
                   {{ i.ItemName }}
@@ -115,10 +123,10 @@
               </div>
             </div>
             <div class="row" clickable :to="'/item/' + i.ItemID">
-              <div class="col-auto">
+              <div class="col-3">
                 <img :src="i.Photos[0].PhotoData" class="HeaderPhoto" v-if="i.Photos.length > 0" />
               </div>
-              <div class="col-auto q-ml-xs" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
+              <div class="col-8 q-ml-xs" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
                 <q-item-label>
                   <q-avatar>
                     <q-icon :name="l.IconCode" class="LocationIcon" size="md" />
@@ -205,11 +213,14 @@ export default {
       TagsOrdered: [],
       TextFilter: "",
       TagFilter: "",
+      PageLoaded: false,
     };
   },
 
   mounted()
   {
+    this.PageLoaded = false;
+
     if (!this.$store.getters["user/IsLoggedIn"])
     {
       this.$router.push("/welcome");
@@ -233,6 +244,8 @@ export default {
             this.FilterItems();
 
             this.Items.forEach(i => { i.SelectedPhoto = 0; this.FullScreen[i.ItemID] = false; })
+
+            this.PageLoaded = true;
           }).catch((e) =>
           {
             error.HandleError("Get items error: " + JSON.stringify(e), error.ERROR_LEVEL_FATAL);
@@ -400,6 +413,17 @@ export default {
 };
 
 </script>
+
+<style>
+
+div.q-item-type div.q-item__section--side
+{
+  width: 24px !important;
+  max-width: 24px !important;
+  min-width: 24px !important;
+}
+
+</style>
 
 <style scoped>
 
