@@ -81,7 +81,7 @@
         @after-hide="RedrawMasonry"
       >
         <template v-slot:header>
-          <div class="row LargeRow" clickable :to="'/item/' + i.ItemID">
+          <div v-if="!$q.screen.lt.sm" class="row" clickable :to="'/item/' + i.ItemID">
             <div class="col-md-2" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
               <q-avatar>
                 <q-icon :name="l.IconCode" class="LocationIcon" size="xl" />
@@ -104,13 +104,13 @@
             </div>
           </div>
 
-          <div>
-            <div class="row SmallRow text-center" clickable :to="'/item/' + i.ItemID">
+          <div v-if="$q.screen.lt.sm" width="100%">
+            <div class="row text-center" clickable :to="'/item/' + i.ItemID">
               <div class="col-12">
                 <q-item-label class="SmallItemName">{{ i.ItemName }}</q-item-label>
               </div>
             </div>
-            <div class="row SmallRow" clickable :to="'/item/' + i.ItemID">
+            <div class="row" clickable :to="'/item/' + i.ItemID">
               <div class="col-auto">
                 <img :src="i.Photos[0].PhotoData" class="HeaderPhoto" v-if="i.Photos.length > 0" />
               </div>
@@ -389,17 +389,6 @@ export default {
   {
     width: 94%;
   }
-
-  div.SmallRow
-  {
-    display: flex;
-    width: 100%;
-  }
-
-  div.LargeRow
-  {
-    display: none;
-  }
 }
 
 @media (min-width: 1024px)
@@ -407,17 +396,6 @@ export default {
   div.ItemCard
   {
     width: 50%;
-  }
-
-  div.SmallRow
-  {
-    display: none;
-  }
-
-  div.LargeRow
-  {
-    display: flex;
-    width: 100%;
   }
 }
 
