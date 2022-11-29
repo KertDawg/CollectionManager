@@ -114,7 +114,7 @@
             </div>
           </div>
 
-          <div v-if="$q.screen.lt.sm">
+          <div v-if="$q.screen.lt.sm" style="width: 100%">
             <div class="row" clickable :to="'/item/' + i.ItemID">
               <div class="col-12">
                 <q-item-label class="SmallItemName">
@@ -123,10 +123,10 @@
               </div>
             </div>
             <div class="row" clickable :to="'/item/' + i.ItemID">
-              <div class="col-3">
+              <div class="col-auto">
                 <img :src="i.Photos[0].PhotoData" class="HeaderPhoto" v-if="i.Photos.length > 0" />
               </div>
-              <div class="col-8 q-ml-xs" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
+              <div class="col-auto q-ml-xs" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
                 <q-item-label>
                   <q-avatar>
                     <q-icon :name="l.IconCode" class="LocationIcon" size="md" />
