@@ -38,6 +38,11 @@ $router->mount($APIBase, function() use ($router) {
 			$Item->GetOneItem($ItemID);
 		});
 
+		$router->get("/public/{ItemID}", function ($ItemID) {
+			$Item = new controllers\Item();
+			$Item->GetOneItemPublic($ItemID);
+		});
+
 		$router->post("/add", function () {
 			$Item = new controllers\Item();
 			$Item->AddItem();

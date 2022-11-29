@@ -34,13 +34,8 @@
         </div>
         <div class="row">
           <div class="col-12">
-            ${{ Item.ItemCost }}
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-12">
             <div class="ControlLabel">Description:</div>
-            {{ Item.ItemDescription }}
+            <div v-html="Item.ItemDescription"></div>
           </div>
         </div>
       </q-card-section>
@@ -133,7 +128,7 @@ export default {
 
     LoadItem: function()
     {
-      api.get("item/one/" + this.ItemID, this.$store)
+      api.get("item/public/" + this.ItemID, this.$store)
           .then((response) =>
           {
             this.Item = response.Item;

@@ -266,18 +266,25 @@ export default {
   {
     CheckProperties: function()
     {
-      if (this.ItemID.toLocaleLowerCase() === "new")
+      if (!this.$store.getters["user/IsLoggedIn"])
       {
-        this.NewItemMode = true;
-        this.PageLoaded = true;
-      }
-      else if (this.ItemID.length > 10)
-      {
-        this.LoadItem();
+        this.$router.push("/welcome");
       }
       else
       {
-        this.$route.push("/home");
+        if (this.ItemID.toLocaleLowerCase() === "new")
+        {
+          this.NewItemMode = true;
+          this.PageLoaded = true;
+        }
+        else if (this.ItemID.length > 10)
+        {
+          this.LoadItem();
+        }
+        else
+        {
+          this.$route.push("/home");
+        }
       }
     },
 

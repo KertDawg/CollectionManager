@@ -93,6 +93,39 @@ class Item
 		\utils\API::RespondSuccess($Out);
 	}
 
+	public function GetOneItemPublic($ItemID)
+	{
+		$Tag = new Tag();
+		$Location = new Location();
+		$Photo = new Photo();
+		$Out = array();
+
+		$bq = \utils\Database::GetDB()->prepare("
+		SELECT i.ItemID, i.ItemName, i.ItemDescription, i.ItemCost
+		FROM Item i
+		WHERE (i.ItemID = ?)
+		ORDER BY i.ItemName;
+		");
+		$bq->execute([$ItemID]);
+
+		foreach($bq as $b)
+		{
+			$obj = array();
+			$obj["ItemID"] = $b["ItemID"];
+			$obj["ItemName"] = $b["ItemName"];
+			$obj["ItemDescription"] = $b["ItemDescription"];
+			$obj["ItemCost"] = $b["ItemCost"];
+
+			$obj["Tags"] = $Tag->GetTagsForItem($b["ItemID"]);
+			$obj["Locations"] = $Location->GetLocationsForItem($b["ItemID"]);
+			$obj["Photos"] = $Photo->GetPhotosForItem($b["ItemID"]);
+
+			$Out["Item"] = $obj;
+		}
+
+		\utils\API::RespondSuccess($Out);
+	}
+
 	public function AddItem()
 	{
 		//  $User["UserID"] will be -1 if they're not logged in.
