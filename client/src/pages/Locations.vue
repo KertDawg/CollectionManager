@@ -1,5 +1,5 @@
 <template>
-  <q-page v-masonry trsnsition-dureciton="0.3s" gutter="10" sLocationger="0.03s">
+  <q-page v-masonry transition-duration="0.3s" gutter="10" sLocationger="0.03s">
     <q-card v-masonry-tile class="InfoCard col-auto">
       <q-card-section>
         <div class="row">

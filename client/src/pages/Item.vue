@@ -1,5 +1,5 @@
 <template>
-  <q-page v-masonry trsnsition-dureciton="0.3s" gutter="10" stagger="0.03s">
+  <q-page v-masonry transition-duration="0.3s" gutter="10" stagger="0.03s">
     <div class="fullscreen text-center q-pa-md flex flex-center" v-if="!PageLoaded">
       <q-spinner-grid
         color="primary"
