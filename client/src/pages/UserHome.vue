@@ -81,8 +81,8 @@
         @after-hide="RedrawMasonry"
       >
         <template v-slot:header>
-          <div v-if="!$q.screen.lt.sm" class="row" clickable :to="'/item/' + i.ItemID">
-            <div class="col-md-2" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
+          <div v-if="!$q.screen.lt.sm" class="row">
+            <div class="col-md-2 q-mr-md" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
               <q-avatar>
                 <q-icon :name="l.IconCode" class="LocationIcon" size="xl" />
                 <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
@@ -90,7 +90,9 @@
             </div>
 
             <div class="col-md-8">
-              <q-item-label class="LargeItemName">{{ i.ItemName }}</q-item-label>
+              <q-item-label class="LargeItemName">
+                {{ i.ItemName }}
+              </q-item-label>
               <q-item-label>
                 <q-chip v-for="t in i.Tags" :key="t.TagID" :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }"
                         class="glossy" :color="t.ColorCode" :text-color="t.TextCode" :icon="t.IconCode">
@@ -107,7 +109,9 @@
           <div v-if="$q.screen.lt.sm" width="100%">
             <div class="row text-center" clickable :to="'/item/' + i.ItemID">
               <div class="col-12">
-                <q-item-label class="SmallItemName">{{ i.ItemName }}</q-item-label>
+                <q-item-label class="SmallItemName">
+                  {{ i.ItemName }}
+                </q-item-label>
               </div>
             </div>
             <div class="row" clickable :to="'/item/' + i.ItemID">
@@ -133,6 +137,13 @@
           </div>
         </template>
 
+        <q-btn 
+          label="Edit" 
+          icon="edit" 
+          color="primary" 
+          rounded glossy 
+          class="q-mb-md q-ml-sm" 
+          @click="$router.push('/item/' + i.ItemID);" />
         <q-carousel
           swipeable
           animated
