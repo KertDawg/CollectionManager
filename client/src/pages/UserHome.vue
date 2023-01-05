@@ -158,11 +158,13 @@
       >
         <template v-slot:header>
           <div v-if="!$q.screen.lt.sm" class="row" style="width: 100%">
-            <div class="col-2 q-mr-md" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
+            <div class="col-2 q-mr-md" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, 'text-align': 'center', }">
               <q-avatar>
                 <q-icon :name="l.IconCode" class="LocationIcon" size="xl" />
-                <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
               </q-avatar>
+              <div class="LocationName">
+                {{ l.LocationName }}
+              </div>
             </div>
 
             <div class="col-7">
@@ -195,11 +197,13 @@
                 <img :src="i.Photos[0].PhotoData" class="HeaderPhoto" v-if="i.Photos.length > 0" />
               </div>
               <div class="col-auto q-ml-xs" v-for="l in i.Locations" :key="l.LocationID" :style="{ 'background-color': l.ColorCode, 'color': l.TextCode, }">
-                <q-item-label>
+                <q-item-label style="text-align: center">
                   <q-avatar>
                     <q-icon :name="l.IconCode" class="LocationIcon" size="md" />
-                    <q-tooltip :delay="1000">{{ l.LocationName }}</q-tooltip>
                   </q-avatar>
+                  <div class="LocationName">
+                    {{ l.LocationName }}
+                  </div>
                 </q-item-label>
                 <q-item-label v-for="t in i.Tags" :key="t.TagID">
                   <q-chip :style="{ 'background-color': t.ColorCode, 'color': t.TextCode }"
@@ -567,6 +571,11 @@ div.LargeItemName
 {
   font-size: x-large;
   font-weight: bold;
+}
+
+div.LocationName
+{
+  font-size: x-small;
 }
 
 i.ChipIcon
