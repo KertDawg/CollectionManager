@@ -8,130 +8,141 @@
     </div>
 
     <q-card v-masonry-tile v-if="PageLoaded" class="InfoCard FilterCard">
-      <q-card-section>
-        <div class="row">
-          <div class="col text-h6">Items</div>
-        </div>
-      </q-card-section>
-      <q-card-section>
-        <div class="row">
-          <div class="col-12">
-            <q-input 
-              label="Filter"
-              v-model="TextFilter"
-              clearable
-              @update:model-value="TextFilterChange" />
+      <q-expansion-item
+        expand-separator
+        switch-toggle-side
+        :dense="$q.screen.lt.sm"
+        @after-show="RedrawMasonry"
+        @after-hide="RedrawMasonry"
+      >
+        <template v-slot:header>
+          <q-card-section>
+            <div class="row">
+              <div class="col text-h6">Search</div>
+            </div>
+          </q-card-section>
+        </template>
+
+        <q-card-section>
+          <div class="row">
+            <div class="col-12">
+              <q-input 
+                label="Filter"
+                v-model="TextFilter"
+                clearable
+                @update:model-value="TextFilterChange" />
+            </div>
           </div>
-        </div>
-        <div class="row q-pt-lg">
-          <div class="col-md-12">
-            Tag:
+          <div class="row q-pt-lg">
+            <div class="col-md-12">
+              Tag:
+            </div>
           </div>
-        </div>
-        <div class="row q-pt-lg" v-if="TagFilter !== ''">
-          <div class="col-md-10">
-            <q-chip
-                class="truncate-chip-labels"
-                outline
-                :style="{ 'background-color': TagFilter.ColorCode, 'color': TagFilter.TextCode, 'width': 'auto' }">
-              <q-icon class="ChipIcon" :style="{ 'color': TagFilter.TextCode }" :name="TagFilter.IconCode" />
-              {{ TagFilter.TagName }}
-            </q-chip>
+          <div class="row q-pt-lg" v-if="TagFilter !== ''">
+            <div class="col-md-10">
+              <q-chip
+                  class="truncate-chip-labels"
+                  outline
+                  :style="{ 'background-color': TagFilter.ColorCode, 'color': TagFilter.TextCode, 'width': 'auto' }">
+                <q-icon class="ChipIcon" :style="{ 'color': TagFilter.TextCode }" :name="TagFilter.IconCode" />
+                {{ TagFilter.TagName }}
+              </q-chip>
+            </div>
+            <div class="col-md-2">
+              <q-btn 
+                v-if="TagFilter !== ''"
+                icon="cancel"
+                flat
+                dense
+                @click="TagFilter = ''; SelectTagFilter();"
+                style="color: #00000050;"
+              />
+            </div>
           </div>
-          <div class="col-md-2">
-            <q-btn 
-              v-if="TagFilter !== ''"
-              icon="cancel"
-              flat
-              dense
-              @click="TagFilter = ''; SelectTagFilter();"
-              style="color: #00000050;"
-            />
+          <div class="row q-pt-lg">
+            <div class="col-12">
+              <q-select v-model="TagFilter"
+                      :options="TagsOrdered"
+                      transition-show="scale"
+                      transition-hide="scale"
+                      options-dense
+                      option-value="TagID"
+                      option-label="TagName"
+                      @update:model-value="SelectTagFilter">
+                <template v-slot:option="{ itemProps, opt }">
+                  <q-item v-bind="itemProps">
+                    <q-item-section>
+                      <div>
+                        <q-chip
+                            class="truncate-chip-labels"
+                            outline
+                            :style="{ 'background-color': opt.ColorCode, 'color': opt.TextCode, 'width': 'auto', 'margin-left': opt.LeftPadding }">
+                          <q-icon class="ChipIcon" :style="{ 'color': opt.TextCode }" :name="opt.IconCode" />
+                          {{ opt.TagName }}
+                        </q-chip>
+                      </div>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </div>
           </div>
-        </div>
-        <div class="row q-pt-lg">
-          <div class="col-12">
-            <q-select v-model="TagFilter"
-                    :options="TagsOrdered"
-                    transition-show="scale"
-                    transition-hide="scale"
-                    options-dense
-                    option-value="TagID"
-                    option-label="TagName"
-                    @update:model-value="SelectTagFilter">
-              <template v-slot:option="{ itemProps, opt }">
-                <q-item v-bind="itemProps">
-                  <q-item-section>
-                    <div>
-                      <q-chip
-                          class="truncate-chip-labels"
-                          outline
-                          :style="{ 'background-color': opt.ColorCode, 'color': opt.TextCode, 'width': 'auto', 'margin-left': opt.LeftPadding }">
-                        <q-icon class="ChipIcon" :style="{ 'color': opt.TextCode }" :name="opt.IconCode" />
-                        {{ opt.TagName }}
-                      </q-chip>
-                    </div>
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
+          <div class="row q-pt-lg">
+            <div class="col-md-12">
+              Location:
+            </div>
           </div>
-        </div>
-        <div class="row q-pt-lg">
-          <div class="col-md-12">
-            Location:
+          <div class="row q-pt-lg" v-if="LocationFilter !== ''">
+            <div class="col-md-10">
+              <q-chip                
+                  class="truncate-chip-labels"
+                  outline
+                  :style="{ 'background-color': LocationFilter.ColorCode, 'color': LocationFilter.TextCode, 'width': 'auto' }">
+                <q-icon class="ChipIcon" :style="{ 'color': LocationFilter.TextCode }" :name="LocationFilter.IconCode" />
+                {{ LocationFilter.LocationName }}
+              </q-chip>
+            </div>
+            <div class="col-md-2">
+              <q-btn 
+                v-if="LocationFilter !== ''"
+                icon="cancel"
+                flat
+                dense
+                @click="LocationFilter = ''; SelectLocationFilter();"
+                style="color: #00000050;"
+              />
+            </div>
           </div>
-        </div>
-        <div class="row q-pt-lg" v-if="LocationFilter !== ''">
-          <div class="col-md-10">
-            <q-chip                
-                class="truncate-chip-labels"
-                outline
-                :style="{ 'background-color': LocationFilter.ColorCode, 'color': LocationFilter.TextCode, 'width': 'auto' }">
-              <q-icon class="ChipIcon" :style="{ 'color': LocationFilter.TextCode }" :name="LocationFilter.IconCode" />
-              {{ LocationFilter.LocationName }}
-            </q-chip>
+          <div class="row q-pt-lg">
+            <div class="col-12">
+              <q-select v-model="LocationFilter"
+                      :options="Locations"
+                      transition-show="scale"
+                      transition-hide="scale"
+                      options-dense
+                      option-value="TagID"
+                      option-label="TagName"
+                      @update:model-value="SelectLocationFilter">
+                <template v-slot:option="{ itemProps, opt }">
+                  <q-item v-bind="itemProps">
+                    <q-item-section>
+                      <div>
+                        <q-chip
+                            class="truncate-chip-labels"
+                            outline
+                            :style="{ 'background-color': opt.ColorCode, 'color': opt.TextCode, 'width': 'auto', 'margin-left': opt.LeftPadding }">
+                          <q-icon class="ChipIcon" :style="{ 'color': opt.TextCode }" :name="opt.IconCode" />
+                          {{ opt.LocationName }}
+                        </q-chip>
+                      </div>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </div>
           </div>
-          <div class="col-md-2">
-            <q-btn 
-              v-if="LocationFilter !== ''"
-              icon="cancel"
-              flat
-              dense
-              @click="LocationFilter = ''; SelectLocationFilter();"
-              style="color: #00000050;"
-            />
-          </div>
-        </div>
-        <div class="row q-pt-lg">
-          <div class="col-12">
-            <q-select v-model="LocationFilter"
-                    :options="Locations"
-                    transition-show="scale"
-                    transition-hide="scale"
-                    options-dense
-                    option-value="TagID"
-                    option-label="TagName"
-                    @update:model-value="SelectLocationFilter">
-              <template v-slot:option="{ itemProps, opt }">
-                <q-item v-bind="itemProps">
-                  <q-item-section>
-                    <div>
-                      <q-chip
-                          class="truncate-chip-labels"
-                          outline
-                          :style="{ 'background-color': opt.ColorCode, 'color': opt.TextCode, 'width': 'auto', 'margin-left': opt.LeftPadding }">
-                        <q-icon class="ChipIcon" :style="{ 'color': opt.TextCode }" :name="opt.IconCode" />
-                        {{ opt.LocationName }}
-                      </q-chip>
-                    </div>
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
-          </div>
-        </div>
-      </q-card-section>
+        </q-card-section>
+      </q-expansion-item>
       <q-card-actions>
         <q-btn class="glossy" rounded color="primary" label="Add a New Item" to="/item/new" />
       </q-card-actions>
@@ -142,7 +153,6 @@
         expand-separator
         switch-toggle-side
         :dense="$q.screen.lt.sm"
-        :label="i.ItemName"
         @after-show="RedrawMasonry"
         @after-hide="RedrawMasonry"
       >
